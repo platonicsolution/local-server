@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Psolz_OrderAttribute>
+            <version>0.1.0</version>
+        </Psolz_OrderAttribute>
+    </modules>
+    <global>
+        <resources>
+                <orderattribute_setup>
+                    <setup>
+                        <module>Psolz_OrderAttribute</module>
+                        <class>Mage_Sales_Model_Mysql4_Setup</class>
+                    </setup>
+                </orderattribute_setup>
+                    <conection>
+                        <use>core_setup</use>
+                    </conection>
+                    <orderattribute_write>
+                        <use>core_write</use>
+                    </orderattribute_write>
+                    <orderattribute_read>
+                        <use>core_read</use>
+                    </orderattribute_read>
+        </resources>
+        <fieldsets>
+            <sales_convert_order><lead_status1><to_order>*</to_order></lead_status1></sales_convert_order>
+        </fieldsets>
+    </global>
+</config>

@@ -1,0 +1,27 @@
+<?php
+/**
+ * Visualize Your Attributes - Color Swatch
+ *
+ * @category:    AdjustWare
+ * @package:     AdjustWare_Icon
+ * @version      3.1.10
+ * @license:     W9f9ElvXIvbmpYLtgppvzIZxNydXRy4MwFD0F07481
+ * @copyright:   Copyright (c) 2014 AITOC, Inc. (http://www.aitoc.com)
+ */
+$items        = $this->getItems();
+$displayStyle = $this->getColumnsNum();
+$iconColor    = $this->getIconColor();
+$textColor    = $this->getIconTextColor();
+$helper       = Mage::helper('adjicon');
+?>
+<ol>
+    <?php if(1 == $displayStyle || AdjustWare_Icon_Helper_Data::VISUALIZATION_TYPE_NONE == $this->getVisualizationType()): // one column ?>
+        <?php foreach ($items as $_item): ?>
+            <li><?php echo $helper->collectAttributeFilterItems($_item, $this) ?></li>
+        <?php endforeach ?>
+    <?php elseif(2 == $displayStyle): // only images ?>
+        <li>
+            <?php foreach($items as $_item) echo $helper->collectAttributeFilterItems($_item, $this) ?>
+        </li>
+    <?php endif ?>
+</ol>

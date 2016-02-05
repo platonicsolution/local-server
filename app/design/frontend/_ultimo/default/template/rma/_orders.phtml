@@ -1,0 +1,183 @@
+<div class="page-title">
+    <h1><?php echo $this->__('Customer RMA Page') ?></h1>
+</div>
+<?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+<form id="awrma-new-form" method="post" action="<?php echo $this->getPostActionUrl() ?>">
+            <input type="hidden" value="Vs0N1UjKozutBU8D" name="form_key">
+            <div class="fieldset">
+                <h2 class="legend">Request Information</h2>
+                <ul class="form-list">
+                    <li class="wide">
+                        <label class="required" for="awrma-order"><em>*</em>Order</label>
+                        <div class="input-box">
+                        
+                        <?php
+$returndate = 60*60*24*(int)Mage::getStoreConfig( 'rma/rma/return_days');
+            $time = time();
+$to = date('Y-m-d H:i:s', $time);
+$lastTime = $time - $returndate; // 60*60*24
+$from = date('Y-m-d H:i:s', $lastTime);
+if(Mage::getSingleton('customer/session')->isLoggedIn()) {
+     $customerData = Mage::getSingleton('customer/session')->getCustomer();
+     $orders = Mage::getModel('sales/order')->getCollection()
+    ->addFieldToFilter('status', 'complete')
+    ->addFieldToFilter('customer_id', $customerData->getId() )
+    ->addAttributeToFilter('updated_at', array('from' => $from, 'to' => $to))
+    ->addAttributeToSelect('*')
+    ;
+    ?><select defaultvalue="" onchange="getitems(this);" class="validate-select required-entry" title="Order" id="awrma-order" name="order" type="select"><option value="">Please select the order Id to Apply RMA on</option> <?php
+foreach ($orders as $order) {
+    ?><option value="<?php echo $order->getData('increment_id'); ?>"><?php echo $order->getData('increment_id').", ". $order->getData('created_at').", " .$order->getData('base_grand_total'); ?></option>
+    <?php
+} ?> </select><input type="hidden" name="customer_id" value="<?php echo $customerData->getId();  ?>" />
+<input type="hidden" name="customer_name" value="<?php echo $customerData->getFirstname() . ' ' . $customerData->getLastname();  ?>" />
+ <?php }
+?>
+                            
+                            
+                        </div>
+                    </li>
+                    <li class="wide">
+                        <label for="awrma-items-ordered-table">Items Ordered</label>
+                        <div class="input-box" id="item-table">
+                            <table border="1" name="items" id="awrma-items-ordered-table" class="data-table">
+                                <thead id="awrma-items-head">
+                                    <tr class="first">
+                                        <th>Check box</th>
+                                        <th>Product Name</th>
+                                        <th>SKU</th>
+                                        <th>Quantity</th>                                    </tr>
+                                    
+                                    
+                                    
+                                    
+                                <tr style="display: block;" id="awrma-items-noorder" class="first last odd">
+                                        <td colspan="4" class="last">No order selected</td>
+                                    </tr><tr style="display: none;" id="awrma-items-loading" class="first last odd">
+                                        <td colspan="4" class="last"><img src="http://rma.demo.aheadworks.com/skin/frontend/default/default/aw_rma/images/ajax-loader.gif"></td>
+                                    </tr><tr style="display: none;" id="awrma-items-error" class="last">
+                                        <td colspan="4" class="last">Some error occurs. Please, try again to select order</td>
+                                    </tr></thead>
+                                <tbody id="awrma-items"></tbody>
+                            </table>
+                        </div>
+                    </li>
+                    <li class="fields">
+                        <div class="field">
+                            <label class="required" for="awrma-packageopened"><em>*</em>Package Opened</label>
+                            <div class="input-box">
+                                <select class="validate-select required-entry" title="Package Opened" id="awrma-packageopened" name="packageopened" type="select">
+                                                                                                                <option selected="selected" value="1">Yes</option>
+                                                                            <option value="0">No</option>
+                                                                    </select>
+                            </div>
+                        </div>
+                                                                            <div class="field">
+                                <label class="required" for="awrma-request-type"><em>*</em>Request Type</label>
+                                <div class="input-box">
+                                                                        <select class="validate-select required-entry" title="Request Type" id="awrma-request-type" name="requesttype" type="select">
+                                                                                    
+                                                                                    
+                                                                                   <?php $this->gettypes(); ?>
+                                                                            </select>
+                                </div>
+                            </div>
+                                            </li>
+                    <li class="wide">
+                        <label for="awrma-additional-info">Additional Information</label>
+                        <div class="input-box">
+                            <textarea id="awrma-additional-info" name="additionalinfo"></textarea>
+                        </div>
+                    </li>
+                                            <li class="wide">
+                            <label class="required" for="reason_id"><em>*</em>Choose Reason</label>
+                            <div class="input-box">
+                                <select class="validate-select required-entry" title="Choose Reason" id="reason_id" name="reason_id" type="select">
+                                    <option value="">Please select reason</option>
+                                                                                                                <?php $this->getreasons(); ?>
+                                                                                                        </select>
+                            </div>
+                        </li>
+                        <li style="display:none;" class="wide" id="reason-information">
+                            <label for="reason_details">Reason Details</label>
+                            <div class="input-box">
+                                <textarea id="reason_details" name="reason_details"></textarea>
+                            </div>
+                        </li>
+                        <script type="text/javascript">
+                            Event.observe(document, 'dom:loaded', function(event) {
+                                if ($('reason_id').value === '0') {
+                                    $('reason-information').show();
+                                }
+                                Event.observe($('reason_id'), 'change', function(event){
+                                    if ($('reason_id').value == '0') {
+                                        $('reason-information').show();
+                                    } else {
+                                        $('reason-information').hide();
+                                    }
+                                });
+                            });
+                        </script>
+                                    </ul>
+            </div>
+                        <div class="fieldset">
+                <h2 class="legend">RMA Policy</h2>
+                <ul class="form-list">
+                    <li class="wide"><p><strong>Product Return</strong></p>
+<p>Returns are acceptable within <?php echo Mage::getStoreConfig( 'rma/rma/return_days'); ?> days of the ship date of the purchase for most products. There will be a 25% restocking fee charged for all returns. Returns are subject to the following guidelines:</p>
+<p>1. Please save all packaging and accessories for any item that is returned. All original equipment, components, manuals, cables, documents and packaging must be returned with your item in order to process your return order.<br>2. The part must be undamaged and completely serviceable.<br>3. The customer is responsible for packaging and return shipping cost.</p>
+<p><strong>Product Exchanges</strong></p>
+<p>Most products may be exchanged within 1 year of the shipment date. Exchanges are subject to the following guidelines:</p>
+<p>1. An item returned for an exchange may be repaired or replaced at our discretion, unless otherwise required by law.<br>2. The part must be sent before a replacement is given or collateral may be required to facilitate the exchange.<br>3. The customer is responsible for packaging and return shipping cost.<br>4. The part must be undamaged and completely serviceable.</p></li>
+                    <li class="control">
+                        <input type="checkbox" id="awrma-policy-agree" class="required-entry checkbox">
+                        <label for="awrma-policy-agree">I agree</label>
+                    </li>
+                </ul>
+            </div>
+                        <div class="buttons-set">
+                <p class="required">* Required Fields</p>
+                <button id="awrma-new-submit" class="button" title="Submit Request" type="submit"><span><span>Submit Request</span></span></button>
+            </div>
+        </form>
+
+<div class="buttons-set">
+    <p class="back-link"><a href="<?php echo $this->getUrl('customer/account/') ?>"><small>&laquo; </small><?php echo $this->__('Back') ?></a></p>
+<input id="baseurl" backurl="<?=Mage::helper("adminhtml")->getUrl("*/*/index")?>" type="hidden" value="<?php echo Mage::getBaseUrl(); ?>"/>
+</div>
+<script type="text/javascript">
+            //&lt;![CDATA[
+            var awrmaNewForm = new VarienForm('awrma-new-form', true);
+              function getitems(sel) {
+                if(sel.value == ""){
+                    $('awrma-items-noorder').show();
+                    $('awrma-items').update("");
+                }else{
+                    var reloadurl =  $('baseurl').value + "multisuppliersmarketplace/rma/orderitems?orderid=" + sel.value;
+
+                new Ajax.Request(reloadurl, {
+
+                    method: 'get',
+
+                    onLoading: function (stateform) {
+                        $('awrma-items-noorder').hide();
+                        $('awrma-items-loading').show();
+                    },
+
+                    onComplete: function(stateform) {
+                        $('awrma-items-loading').hide();
+                       $('awrma-items').update(stateform.responseText)
+                       }
+
+                });
+                }
+        
+    }
+             
+                            //]]&gt;
+                            
+        </script>
+        
+             
+
+

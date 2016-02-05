@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <returnpolicy_index_index>
+        <reference name="content">
+            <!--<block type="returnpolicy/returnpolicy" name="returnpolicy" /> -->
+            <block type="returnpolicy/returnpolicy" name="returnpolicy" template="returnpolicy/returnpolicy.phtml" >
+              <block type="page/html_pager" name="returnpolicy_pager" as="pager" template="returnpolicy/pager/pager.phtml"/>
+            </block>  
+        </reference>
+    </returnpolicy_index_index>
+</layout>

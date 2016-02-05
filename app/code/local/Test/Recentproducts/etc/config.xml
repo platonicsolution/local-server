@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config>
+  <modules>
+    <Test_Recentproducts>
+      <version>1.0.2</version>
+    </Test_Recentproducts>
+  </modules>
+  <global>
+    <blocks>
+      <recentproducts>
+        <class>Test_Recentproducts_Block</class>
+      </recentproducts>
+    </blocks>
+    <models>
+      <recentproducts>
+        <class>Test_Recentproducts_Model</class>
+      </recentproducts>
+    </models>
+  </global>
+</config>

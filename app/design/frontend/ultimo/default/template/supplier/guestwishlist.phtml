@@ -1,0 +1,59 @@
+<div class="my-wishlist">
+        <div class="page-title title-buttons">
+                        <h1>Wishlist</h1>
+        </div>
+        
+        <fieldset>
+                                                <table id="wishlist-table" class="data-table">
+    <thead>
+        <tr class="first last">
+                            <th>Product</th>
+                            <th>Product Details and Comment</th>
+                            <th>Add to Cart</th>
+                    </tr>
+    </thead>
+    <tbody>
+    <?php 
+    $decoded = json_decode(Mage::getModel('core/cookie')->get('mywish'));
+    foreach($decoded as $index => $productId):
+    $_product = Mage::getModel('catalog/product')->load($productId);     ?>
+                                    <tr id="item_<?php echo $index; ?>" class="first last odd">
+                                            <td><a title="<?php echo $_product->getName();?>" href="<?php echo $_product->getProductUrl() ?>" class="product-image">
+    <img alt="<?php echo $_product->getName();?>" src="<?php echo $this->helper('infortis/image')->getImg($_product, $imgWidth, $imgHeight, 'small_image'); ?>">
+</a>
+</td>
+                                            <td><h3 class="product-name"><a title="<?php echo $_product->getName();?>" href="<?php echo $_product->getProductUrl() ?>"><?php echo $_product->getName();?></a></h3>
+<div class="description std"><div class="inner"><?php echo $_product->getShortDescription()?>
+</div></div>
+</td>
+                                            <td><div class="cart-cell">
+
+
+<div class="add-to-cart-alt">
+    <a class="button btn-cart" href="<?php echo Mage::helper('checkout/cart')->getAddUrl($_product); ?>" title="Add to Cart" ><span><span>Add to Cart</span></span></a>
+</div>
+    
+    </div>
+</td>
+                                           
+                                    </tr>
+                                    <?php endforeach; ?>
+                        </tbody>
+</table>
+                <script type="text/javascript">
+//&lt;![CDATA[
+    decorateTable('wishlist-table');
+
+        
+       
+</script>
+                        <script type="text/javascript">decorateTable('wishlist-table')</script>
+                                <div class="buttons-set buttons-set2">
+                    
+    </div>
+            </fieldset>
+       
+
+
+
+    </div>

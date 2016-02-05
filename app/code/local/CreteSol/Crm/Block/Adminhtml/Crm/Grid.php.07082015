@@ -1,0 +1,403 @@
+<?php
+
+ 
+
+class CreteSol_Crm_Block_Adminhtml_Crm_Grid extends Mage_Adminhtml_Block_Widget_Grid
+
+{
+
+    public function __construct()
+
+    {
+
+        set_time_limit(0);
+
+        parent::__construct();
+
+        $this->setId('crmGrid');
+
+        $this->setDefaultSort('created_at');
+
+        $this->setDefaultDir('DESC');
+
+        $this->setSaveParametersInSession(false);
+
+        $this->setUseAjax(true);
+        
+
+    }
+
+
+
+    protected function _prepareCollection()
+
+    {
+
+
+                //echo $this->getRequest()->getParam('c');
+
+                  $collection = Mage::getModel('crm/crmorders')->getCollection();
+
+                  $collection->addFieldToSelect('converted_order');
+                   
+                   $collection->addFieldToFilter('lead_status',array(
+
+                      array(CreteSol_Crm_Helper_Data::STATE_UNCONVERTED),
+
+                      array( 'eq'=>CreteSol_Crm_Helper_Data::STATE_CONVERTED)
+
+                    ));
+                    
+                        $collection->addFieldToFilter('rm_dup_status',array('eq'=> new Zend_Db_Expr('IF(lead_status = "unconverted",1,0)')));
+                        if($this->getRequest()->getParam('c')){
+                            $collection->addFieldToFilter('call_back_date',date('Y-m-d'));
+                            $this->getRequest()->setParam('c',null);
+                            
+                            unset($_GET['c']);
+                          
+                        }
+         $collection->getSelect()->joinRight(array('s' => Mage::getSingleton('core/resource')->
+
+                getTableName('sales_flat_order')),
+
+            'main_table.crm_order_id  = s.entity_id ', array('*'))
+            ->join(array('oadr' => Mage::getSingleton('core/resource')->
+                getTableName('sales_flat_order_address')),
+            's.entity_id = oadr.parent_id AND oadr.address_type="billing"', array('oadr.postcode',
+                'oadr.telephone','oadr.firstname','oadr.lastname'))
+            
+            ->order('s.created_at DESC');
+            
+                $this->setCollection($collection);
+                       
+              
+    // $data =  Mage::helper('adminhtml')->prepareFilterString($this->getRequest()->getParam('filter'));
+//                        print_r($this->getVarNameFilter());
+                        
+        return parent::_prepareCollection();
+
+    }
+
+
+
+ 
+
+ 
+
+  
+
+    protected function _prepareColumns()
+
+    {
+
+        //$this->addColumn('entity_id', array(
+//
+//            'header'=> $this->__('Entity ID #'),
+//
+//            'width' => '80px',
+//
+//            'type'  => 'text',
+//
+//            'index' => 'entity_id',
+//
+//        ));
+
+        $this->addColumn('real_order_id', array(
+
+            'header'=> Mage::helper('sales')->__('Order #'),
+
+             'width' => '20',
+
+            'type'  => 'text',
+
+            'index' => 'increment_id',
+
+        ));
+
+        
+
+        $this->addColumn('created_at', array(
+
+            'header' => $this->__('Purchased On'),
+
+            'index' => 'created_at',
+
+            'type' => 'datetime',
+
+            'format' => Mage::app()->getLocale()
+
+               ->getDateTimeFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT),
+
+            'width' => '20',
+
+        ));
+
+
+
+        $this->addColumn('firstname', array(
+
+            'header' => $this->__('First Name'),
+
+            'index' => 'firstname',
+             'width' => '20',
+        ));
+
+
+
+        $this->addColumn('lastname', array(
+
+            'header' => $this->__('Last Name'),
+
+            'index' => 'lastname',
+             'width' => '20',
+        ));
+
+$this->addColumn('customer_email', array(
+
+            'header' => $this->__('Email'),
+
+            'index' => 'customer_email',
+             'width' => '20',
+             'renderer'  => 'CreteSol_Crm_Block_Adminhtml_Template_Grid_Renderer_Emailrender',
+
+        ));
+
+        //$this->addColumn('base_grand_total', array(
+
+//            'header' => $this->__('G.T. (Base)'),
+
+//            'index' => 'base_grand_total',
+
+//            'type'  => 'currency',
+
+//            'currency' => 'base_currency_code',
+
+//        ));
+
+        $this->addColumn('grand_total', array(
+
+            'header' => $this->__('Price'),
+
+            'index' => 'grand_total',
+
+            'type'  => 'currency',
+
+            'currency' => 'order_currency_code',
+             'width' => '20',
+        ));
+
+
+
+        $this->addColumn('status', array(
+
+            'header' => $this->__('Status'),
+
+            'index' => 'status',
+
+            'type'  => 'options',
+
+            'options' => Mage::getSingleton('sales/order_config')->getStatuses(),
+            
+        ));
+
+         $this->addColumn('sample_size', array(
+
+            'header' => $this->__('Sample Size'),
+
+            'index' => 'sample_size',
+
+            'type'  => 'text',
+
+            //'options' => array(' Full Size ',' Cut Size ')
+             'width' => '20',
+        ));
+
+        $this->addColumn('sku_weighting', array(
+
+            'header' => $this->__('SKU Weighting'),
+
+            'index' => 'sku_weighting',
+
+            'type'  => 'range',
+             'width' => '20',
+        ));
+
+        $this->addColumn('post_weighting', array(
+
+            'header' => $this->__('PostCode Weighting'),
+
+            'index' => 'post_weighting',
+
+            'type'  => 'range',
+             'width' => '20',
+        ));
+
+        
+
+         $this->addColumn('product_sku', array(
+
+            'header' => $this->__('Product Sku'),
+
+            'index' => 'product_sku',
+
+            'type'  => 'text',
+             'width' => '20',
+        ));
+
+        $this->addColumn('product_name', array(
+
+            'header' => $this->__('Product Name'),
+
+            'index' => 'product_name',
+
+            'type'  => 'text',
+             'width' => '20',
+        ));
+
+        $this->addColumn('call_status', array(
+
+            'header' => $this->__('Call Status'),
+
+            'index' => 'call_status',
+
+            'type'  => 'options',
+
+            'options' =>array('answered'=>'Answered','unanswered'=>'Unanswered','send_email'=>'Send Email','call_back'=>'Call Back','placed_order'=>'Place Order','closed'=>'Closed'),
+
+             'width' => '20',
+
+        ));
+        $this->addColumn('call_back_date', array(
+            'header' => $this->__('Call Back Date'),
+            'index' => 'call_back_date',
+            'type' => 'datetime',
+            //'format' => Mage::app()->getLocale()
+              //  ->getDateTimeFormat(Mage_Core_Model_Locale::FORMAT_TYPE_SHORT),
+            'width' => '20',
+            
+            
+        ));
+        $this->addColumn('number_of_orders', array(
+
+            'header' => $this->__('# Orders'),
+
+            'index' => 'number_of_orders',
+
+            'type'  => 'int',
+
+            'filter'    => false,
+             'width' => '20',
+        ));
+
+        $this->addColumn('converted_order', array(
+
+            'header' => $this->__('Converted Order'),
+
+            'index' => 'converted_order',
+
+            'type'      => 'action',
+
+            'getter'     => 'getConvertedOrder',
+
+            
+
+                    'filter'    => false,
+
+                    'renderer'  => 'CreteSol_Crm_Block_Adminhtml_Template_Grid_Renderer_Convertedorder',
+
+                    'sortable'  => false,
+
+                    //'index'     => 'stores',
+
+                    'is_system' => true,
+                     'width' => '20',
+
+        ));
+
+        $this->addColumn('lead_status', array(
+
+            'header' => $this->__('Lead Status'),
+
+            'index' => 'lead_status',
+
+            'type'  => 'options',
+
+            'options' => array(CreteSol_Crm_Helper_Data::STATE_CONVERTED=>'Converted',CreteSol_Crm_Helper_Data::STATE_UNCONVERTED=>'Unconverted')));
+
+        
+
+            //$this->addColumn('action',
+//
+//                array(
+//
+//                    'header'    => $this->__('Action'),
+//
+//                     'width' => '20',
+//
+//                    'type'      => 'action',
+//
+//                    'getter'     => 'getEntityId',
+//
+//                    'actions'   => array(
+//
+//                        array(
+//
+//                            'caption' => $this->__('View'),
+//
+//                            'url'     => array('base'=>'*/*/edit'),
+//
+//                            'field'   => 'order_id',
+//
+//                            'data-column' => 'action',
+//
+//                        )
+//
+//                    ),
+//
+//                    'filter'    => false,
+//
+//                    'sortable'  => false,
+//
+//                    'index'     => 'stores',
+//
+//                    'is_system' => true,
+//
+//            ));
+//
+        
+
+       
+
+ 
+
+        return parent::_prepareColumns();
+
+    }
+
+ 
+
+ 
+
+    public function getRowUrl($row)
+
+    {
+
+        return $this->getUrl('*/*/edit', array('order_id' => $row->getEntityId()));
+
+    }
+
+ 
+
+    public function getGridUrl()
+
+    {
+
+      return $this->getUrl('*/*/grid', array('_current'=>true));
+
+    }
+
+ 
+
+ 
+
+}

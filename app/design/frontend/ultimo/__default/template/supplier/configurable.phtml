@@ -1,0 +1,252 @@
+
+
+<?php
+$current_user = Mage::getSingleton( 'admin/session' )->getUser();
+
+
+ if($current_user->getUserId() == Mage::getStoreConfig( 'multisuppliers/multisuppliers/dummy_supplier') || $current_user->getRole()->getRoleId() != Mage::getStoreConfig( 'multisuppliers/multisuppliers/vendors_role' ) ){
+    
+
+ if(empty($_POST) && !isset($_POST['data']) && $_POST['data'] == ''){
+    ?>
+    <div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?=$this->__('Load Desire CSV')?></h3></td>
+            <td class="a-right">
+                <button onclick="editForm.submit()" class="scalable save" type="button"><span>Load</span></button>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="entry-edit">
+    <form id="edit_form" name="edit_form" method="post" action="<?=$this->getUrl('*/*/postcsv')?>" enctype="multipart/form-data">
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+        <h4 class="icon-head head-edit-form fieldset-legend"><?=$this->__('CSV')?></h4>
+        <fieldset id="my-fieldset">
+        <table cellspacing="5" border="0">
+            
+         <tr><td><input id="file" type="file" title="File" name="csv" class="required-entry"></td> </tr>   
+            <input  id="baseurl" type="hidden" value="<?php echo Mage::getBaseUrl(); ?>"/>
+        </table></fieldset>
+    </form>
+</div>
+<script type="text/javascript">
+    var editForm = new varienForm('edit_form');
+</script>
+<?php }
+
+elseif(isset($_POST['data']) && $_POST['data'] != '')
+{
+    ?><div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?=$this->__('Desire Settings')?></h3></td>
+            <td class="a-right">
+                <button onclick="editForm.submit()" class="scalable save" type="button"><span>Convert to Products</span></button>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="entry-edit">
+    <form id="edit_form" name="edit_form" method="post" action="<?=$this->getUrl('*/*/getcsv')?>" enctype="multipart/form-data">
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+        <h4 class="icon-head head-edit-form fieldset-legend"><?=$this->__('Set information Accordingly')?></h4>
+        <fieldset id="my-fieldset">
+        <?php $columns = $_POST['data']; ?>
+        <table cellspacing="5" border="0">
+        <tr><th>Store </th><th>Type</th></tr> 
+        <tr><td>
+        <select style="width: 260px;" id="confg_store_id" name="store"  class="required-entry"><option value="">Please select the store .....</option>
+               <?php $this->loadstores(); ?>
+               </select>
+        
+        </td><td>
+        <select style="width: 260px;" id="simple_store_id" name="type"  class="required-entry"><option value="">Please select the type of products.....</option>
+               <option value="1">Configurable Products</option>
+               <option value="2">Simple Products</option>
+               </select>
+        
+        </td>
+        <td>
+        <?php $entityTypeId = Mage::getModel('eav/entity')
+                ->setType('catalog_product')
+                ->getTypeId();
+$attributeSetCollection = Mage::getModel('eav/entity_attribute_set')
+                ->getCollection()
+                ->setEntityTypeFilter($entityTypeId);
+?>
+        <select style="width: 260px;" id="attributeseid" name="attributeseid"  class="required-entry" >
+        <?php foreach($attributeSetCollection as $_attributeSet){?> 
+     <option value="<?php echo $_attributeSet->getData('attribute_set_id'); ?>"><?php echo $_attributeSet->getData('attribute_set_name'); ?></option>
+    <?php
+} 
+  ?>
+        </select>
+        
+        </td>
+        </tr>
+        </table>
+        <table cellspacing="5" border="0" >
+        <tr><th>CSV Column</th><th>Type</th></tr>
+        <?php for($i=0; $i<count($_POST['data'][0]); $i++) { ?>
+        <tr><td>
+        <?php echo $_POST['data'][0][$i]; ?>
+        </td><td>
+        <select index="<?php echo ($i); ?>" rel="<?php echo("chk" .$i ); ?>" style="width: 260px;" name="column[]"  class="" onchange="getchkbox(this)"><option value="">please select the column</option>
+               <option value="name">Name of Product</option>
+               <option value="sku">SKU of Product</option>
+               <option value="category">Category of Product</option>
+               <option value="subcategory">SubCategory of Product</option>
+               <option value="attribute">Attribute of Product</option>
+               <option value="description">Description of Product</option>
+               <option value="image">Image of Product</option>
+               <option value="manufacturer">Brand Attribute</option>
+               <option value="colorimage">Color Image Attribute</option>
+                <option value="color">Color Caption Attribute</option>
+               <option value="price">Price of Product</option>
+               </select>
+        
+        </td>
+        <td>
+        <div id="<?php echo("chk" .$i ); ?>"></div>
+        </td>
+        </tr>    
+         <?php } ?> 
+         <tr><th>Default Price </th><th>Default Brand</th></tr>
+        <tr><td><input type="text" name="dprice" class="input-text" /> </td>
+        <td><input type="text" name="dbrand" class="input-text" /> </td></tr>  
+            <input  id="baseurl" type="hidden" value="<?php echo Mage::getBaseUrl(); ?>"/>
+             <input name="filepath"  id="filepath" type="hidden" value="<?php echo $_POST['file']; ?>"/>
+        </table>
+        <table cellspacing="0" class="actions">
+        <tbody><tr>
+                    <td class="pager">
+            Limit to convert each time  <select id="limiter" name="limiter">
+                <option selected="selected" value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+            </select>
+            rows <span class="separator">|</span>
+            Total <strong><?php echo count($_POST['data']) - 1; ?></strong> records found
+                    </td>
+                </tr><input type="hidden" readonly="true" name="llimiter" value="1" />    </tbody>
+    </table>
+        </fieldset>
+    </form>
+</div>
+<script type="text/javascript">
+    var editForm = new varienForm('edit_form');
+    
+    function getchkbox(selectElement){
+       if(selectElement.value == "attribute"){
+        $(selectElement.readAttribute('rel')).update('<input id="attr'+selectElement.readAttribute('index') +'" type="checkbox" name="attrchkbox[]" value="'+ selectElement.readAttribute('index') +'"/> <label for="attr'+selectElement.readAttribute('index') +'">Configurable Attribute </label>');
+        
+       } else{
+        $(selectElement.readAttribute('rel')).update('');
+       }
+    }
+</script>
+<?php }elseif($_POST['limiter'] !=""){
+    ?>
+    <div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?=$this->__('Desire Settings')?></h3></td>
+            <td class="a-right">
+                <button onclick="editForm.submit()" class="scalable save" type="button"><span>Convert to Products</span></button>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="entry-edit">
+    <form id="edit_form" name="edit_form" method="post" action="<?=$this->getUrl('*/*/postcsv')?>" enctype="multipart/form-data">
+         <input  id="baseurl" type="hidden" value="<?php echo Mage::getBaseUrl(); ?>"/>
+          <input  id="" name="columnarray" type="hidden" value='<?php echo $_POST['columnarray']; ?>'/> 
+          <input  id="" name="attrchkbox" type="hidden" value='<?php echo $_POST['attrchkbox']; ?>'/>  
+          <input name="filepath"  id="filepath" type="hidden" value="<?php echo $_POST['filepath']; ?>"/>
+         <input type="hidden" readonly="true" name="lowerlimit" value="<?php echo $_POST['lowerlimit']; ?>" />
+         <input name="defaultprice"  id="" type="hidden" value="<?php echo $_POST['defaultprice']; ?>"/>
+         <input type="hidden" readonly="true" name="defaultbrand" value="<?php echo $_POST['defaultbrand']; ?>" />
+         <input type="hidden" readonly="true" name="upperlimit" value="<?php echo $_POST['upperlimit']; ?>" />
+         <input type="hidden" readonly="true" name="type" value="<?php echo $_POST['type']; ?>" />
+         <input type="hidden" readonly="true" name="attributeseid" value="<?php echo $_POST['attributeseid']; ?>" />
+         
+         <input type="hidden" readonly="true" name="store" value="<?php echo $_POST['store']; ?>" />
+    <input type="hidden" readonly="true" name="limiter" value="<?php echo $_POST['limiter']; ?>" />
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+        <h4 class="icon-head head-edit-form fieldset-legend"><?=$this->__('Begin Conversion')?></h4>
+        <fieldset id="my-fieldset">
+        <p> Every Time you press "convert to Product button" <?php echo $_POST['limiter']; ?> products will be created </p>
+        </fieldset>
+        <fieldset>
+        <table cellspacing="0" border="1" style="width: 100%; text-align: center;">
+        <thead>
+        <tr>
+        <th style="text-align: center;">CATEGORY</th>
+        <th style="text-align: center;">SUB-CATEGORY</th>
+        <th style="text-align: center;">NAME</th>
+        <th style="text-align: center;">SKU</th>
+        <th style="text-align: center;">PRICE</th>
+        <th style="text-align: center;">BRAND</th>
+        </tr>
+        </thead><tbody>
+        <?php 
+        $newcolumns = json_decode($this->getRequest()->getPost('columnarray'));
+        $csv = new Varien_File_Csv();
+        $htmldata = $csv->getData($_POST['filepath']);
+    $columnnamearray =array();
+        foreach($newcolumns as $column=>$name)
+        {
+            $columnnamearray[$name][] = $column;
+            }
+        for($i=$this->getRequest()->getPost('lowerlimit'); $i<=$this->getRequest()->getPost('upperlimit'); $i++)
+         {
+           ?>
+           <tr>
+           
+             <td><?php echo $htmldata[$i][$columnnamearray['category'][0]];?></td>
+             <td><?php echo $htmldata[$i][$columnnamearray['subcategory'][0]];?></td>
+             <td><?php echo $htmldata[$i][$columnnamearray['name'][0]];?></td>
+             <td><?php echo $htmldata[$i][$columnnamearray['sku'][0]];?></td>
+             <td><?php if($_POST['defaultprice'] == ""){
+                echo $htmldata[$i][$columnnamearray['price'][0]];
+             }else{
+                echo $_POST['defaultprice'];
+             }
+             ?></td>
+             <td><?php if($_POST['defaultprice'] == ""){
+                echo $htmldata[$i][$columnnamearray['manufacturer'][0]];
+             }else{
+                echo $_POST['defaultbrand'];
+             }
+             ?></td>   
+           </tr>
+           <?php 
+            
+         }
+        
+        ?> 
+        
+        </tbody></table>
+        </fieldset>
+        </form>
+        </div>
+    
+   <script type="text/javascript">
+    var editForm = new varienForm('edit_form');
+</script>
+<?php }  }else{?>
+
+<div class="entry-edit">
+        
+        <fieldset id="my-fieldset">
+        <h4 class="icon-head head-edit-form fieldset-legend"><?=$this->__('ACCESS DENIED')?></h4>
+    </form>
+</div>
+<?php
+    
+    
+}?>
+

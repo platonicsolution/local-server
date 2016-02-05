@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <CreteSol_Survey>
+            <version>0.1.0</version>
+        </CreteSol_Survey>
+    </modules>
+    <frontend>
+        <routers>
+            <Survey>
+                <use>standard</use>
+                <args>
+                    <module>CreteSol_Survey</module>
+                    <frontName>survey</frontName>
+                </args>
+            </Survey>
+        </routers>
+        <layout>
+            <updates>
+                <crm>
+                    <file>survey.xml</file>
+                </crm>
+            </updates>
+        </layout>
+    </frontend>   
+    <global>
+        <models>
+            <survey>
+                <class>CreteSol_Survey_Model</class>
+                <resourceModel>survey_mysql4</resourceModel>
+            </survey>
+            <survey_mysql4>
+                <class>CreteSol_Survey_Model_Mysql4</class>
+                <entities>
+                    <survey>
+                        <table>survey</table>
+                    </survey>
+                </entities>
+            </survey_mysql4>
+        </models>
+        <resources>
+            <survey_setup>
+                <setup>
+                    <module>CreteSol_Survey</module>
+                    
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </survey_setup>
+            <survey_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </survey_write>
+            <survey_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </survey_read>
+        </resources>
+        <blocks>
+            <survey>
+                <class>CreteSol_Survey_Block</class>
+            </survey>
+        </blocks>
+        <helpers>
+            <survey>
+                <class>CreteSol_Survey_Helper</class>
+            </survey>
+        </helpers>
+        <layout>
+            <updates>
+                <survey>
+                    <file>survey.xml</file>
+                </survey>
+            </updates>
+        </layout>
+    </global>
+    <admin>
+       <routers>
+		<!--<survey>
+				<use>admin</use>
+				<args>
+					
+                    <modules>
+                        <CreteSol_Survey after="Mage_Adminhtml">CreteSol_Survey</CreteSol_Survey>
+                    </modules>
+				</args>
+		</survey>-->
+        
+        <adminhtml>
+                <args>
+                    <modules>
+                        <CreteSol_Survey before="Mage_Adminhtml">CreteSol_Survey_Adminhtml</CreteSol_Survey>
+                    </modules>
+                </args>
+            </adminhtml>
+         
+		</routers> 
+    </admin>
+<adminhtml>
+   <layout>
+      <updates>
+          <survey>
+              <file>survey.xml</file>
+           </survey>
+      </updates>
+   </layout>
+        <menu>
+            <survey translate="title" module="survey">
+                <title>Survey</title>
+                <sort_order>71</sort_order>               
+                <children>
+                    <surveylist>
+                        <title>Survey List</title>
+                        
+                        <action>adminhtml/survey/index/</action>
+                    </surveylist>
+                   <csvupload>
+                        <title>Csv Upload</title>
+                        <action>adminhtml/survey/uploadcsvsurvey/</action>
+                    </csvupload>
+                    <syncdata>
+                        <title>TypeForm Sync data</title>
+                        <action>adminhtml/survey/syncdata/</action>
+                    </syncdata>
+                </children>
+            </survey>
+        </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <survey translate="title" module="survey">
+                        <title>Survey</title>
+                        <sort_order>71</sort_order>
+                        <children>
+                            <surveylist>
+                                <title>Survey List</title>
+                            </surveylist>
+                            <csvupload>
+                                <title>Csv Upload</title>
+                            </csvupload>
+                        </children>
+                    </survey>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <survey>
+                                        <title>Ignite Survey</title>
+                                    </survey>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+      
+    
+  
+    </adminhtml>
+    
+</config>

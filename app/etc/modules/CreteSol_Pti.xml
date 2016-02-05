@@ -1,0 +1,8 @@
+<config>
+    <modules>
+        <CreteSol_Pti>
+            <active>true</active>
+            <codePool>local</codePool>
+        </CreteSol_Pti>
+    </modules>
+</config>

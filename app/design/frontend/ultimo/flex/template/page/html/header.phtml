@@ -1,0 +1,814 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+/**
+ * @var Mage_Page_Block_Html_Header $this
+ */
+?>
+<div id="check-cart-popup" style="width: 150px; height: 150px; z-index: 999999; position: fixed; background: none repeat scroll 0% 0% rgb(255, 255, 255); padding: 5px 10px; border: 3px solid rgb(59, 162, 219); display: none; top: 15%; left: 40%;">
+<p> You cart will become empty </p>
+<p> 
+<button onclick="return false;" class="button btn-continue btn-inline p-continue" id="" title="Continue" type="button"><span><span>Continue</span></span></button>
+
+<button onclick="return false;" class="button btn-continue btn-inline p-cancel" title="cancel" type="button"><span><span>Cancel</span></span></button>
+</p>
+</div>
+<?php
+//echo Mage::app()->getStore()->getCode();
+//Mage::app()->setCurrentStore(Mage::app()->getStore()->getId());
+//Mage::getModel('core/cookie')->set('store',Mage::app()->getStore()->getCode());
+ //echo '<pre>';print_r( Mage::getModel('core/cookie')->get()); echo '</pre>'; echo Mage::app()->getStore()->getId();
+//echo Mage::app()->getCurrentStore();
+$baseUrl = explode('?',Mage::helper('core/url')->getCurrentUrl());
+ $baseUrl = $baseUrl[0];
+
+?>
+
+<?php   
+    $theme = $this->helper('ultimo');   
+    $headerInnerBgColor     = $theme->getCfgDesign('header/inner_bg_color');
+    $navStretched           = $theme->getCfgDesign('nav/stretched');
+    $navInnerBgColor        = $theme->getCfgDesign('nav/inner_bg_color');
+    $navDropShadow          = $theme->getCfgDesign('effects/shadow_nav');
+    $mainInnerBgColor       = $theme->getCfgDesign('main/inner_bg_color');
+    
+    //Header settings
+    $headerCss = array();
+    
+    if ($theme->isColor($headerInnerBgColor))
+    {
+        $headerCss[] = 'show-bg';
+    }
+    else
+    {
+        //If header has no inner background color and menu is stretched, header is also stretched
+        if ($navStretched)
+        {
+            $headerCss[] = 'stretched';
+        }
+    }
+    
+    //Menu settings
+    $navCss = array();
+    
+    //If menu is stretched, it is as wide as container and side margins are removed
+    if ($navStretched)
+    {
+        $navCss[] = 'stretched';
+    }
+
+    //If menu has inner background color, add class indicating that it also has an outline
+    if ($theme->isColor($navInnerBgColor))
+    {
+        $navCss[] = 'has-outline';
+    }
+
+
+
+    //TODO
+    //$navDropShadow = 'bar';
+    if ($navDropShadow === 'inner-container')
+    {
+        $navCss[] = 'show-bg';
+    }
+    elseif ($navDropShadow === 'bar')
+    {
+        $navCss[] = 'nav-bar-drop-shadow';
+    }
+
+    //If header or menu has inner background color, nav also has inner background color
+/*
+    if ($theme->isColor($headerInnerBgColor))
+    {
+        $navCss[] = 'show-bg';
+    }
+    elseif ($theme->isColor($mainInnerBgColor))
+    {
+        $navCss[] = 'show-bg';
+    }
+*/
+
+
+?>
+<?php
+    //Search box classes
+    $searchClasses = ' search-wrapper search-wrapper-mobile';
+
+    //Search box
+    $tmpHtml = $this->getChildHtml('topSearch');
+    $searchPosition = $theme->getCfg('header/search_position');
+    switch ($searchPosition)
+    {
+        case 20:
+            $p['centralCol'][0] = $tmpHtml;
+            break;
+        case 30:
+            $p['rightCol'][0] = $tmpHtml;
+            break;
+        case 31:
+            $p['rightCol'][1] = $tmpHtml;
+            break;
+        case 32:
+            $p['rightCol'][2] = $tmpHtml;
+            break;
+        case 33:
+            $p['rightCol'][3] = $tmpHtml;
+            break;
+    }
+
+    //Line break
+    $tmpHtml = '<div class="line-break-after"></div>';
+    $lineBreakPosition = $theme->getCfg('header/toplinks_break_position');
+    switch ($lineBreakPosition)
+    {
+        case 30:
+            $p['rightColBreak'][0] = $tmpHtml;
+            break;
+        case 31:
+            $p['rightColBreak'][1] = $tmpHtml;
+            break;
+        case 32:
+            $p['rightColBreak'][2] = $tmpHtml;
+            break;
+        case 33:
+            $p['rightColBreak'][3] = $tmpHtml;
+            break;
+        case 34:
+            $p['rightColBreak'][4] = $tmpHtml;
+            break;
+        case 35:
+            $p['rightColBreak'][5] = $tmpHtml;
+            break;
+    }
+
+
+
+    // --------------------------------------------------------------
+    //Width (in grid units) of sections
+    $leftColUnits               = 4; //$theme->getCfg('header/left_column');
+    $centralColUnits            = 4; //$theme->getCfg('header/center_column');
+    $rightColUnits              = 4; //$theme->getCfg('header/right_column');
+
+    //If no search box in the center
+    if (!isset($p['centralCol']))
+    {
+        $centralColUnits        = 0;
+        $rightColUnits          += 12 - ($leftColUnits + $rightColUnits);
+    }
+
+    //Grid classes
+    $leftColUnits = 3;
+    $leftColGridClass           = 'grid12-' . $leftColUnits;
+    $centralColGridClass        = 'grid12-' . $centralColUnits;
+    $rightColGridClass          = 'grid12-' . $rightColUnits;
+    if (empty($centralColUnits))
+    {
+        $centralColGridClass = '';
+    }
+
+    // --------------------------------------------------------------
+    
+?>
+<div class="header-container" id="top">
+<div class="header-container2">
+<div class="header-container3">
+
+    <div class="header-top-container">
+        <div class="header-top header container clearer<?php if($headerCss) echo " " . implode(" ", $headerCss); ?>">
+            <div class="grid-full">
+            
+<div style="position: relative;" id="flex-location">            
+
+<div style="position: relative;float: right;" class="location"><strong>Country : </strong></a><span style="cursor: pointer;">
+       <?php
+       if(Mage::app()->getStore()->getCode() == "furnishplex_usa")
+       {
+        echo "USA";
+        $usa = "";
+        $canada = "id-canada";
+       }elseif(Mage::app()->getStore()->getCode() == "furnishplex"){
+        echo "Canada";
+        $usa = "id-usa";
+        $canada = "";
+       }
+       
+       ?>
+       
+       </span></div>
+       
+<div id="location-flex-popup" style="right: 0px; top: 30px; width: 421px; z-index: 2; position: absolute; background: none repeat scroll 0% 0% rgb(255, 255, 255); padding: 5px 10px; border: 3px solid rgb(59, 162, 219); display: none;">
+
+<ul class="form-list" style="">
+
+            <li class="fields" style="margin-bottom: 0px;">
+
+                    <div class="field" style="width: 31.3% !important; margin-right: 10px; margin-bottom: 0px;">
+                        <?php if(Mage::helper('checkout/cart')->getItemsCount() > 0): ?>
+                        <span id="<?php echo $canada ?>" class="location-country cart-check" style="display: block; line-height: 10px;cursor: pointer;" ><a href="javascript:void(0);">CANADA</a></span>
+                        <span id="<?php echo $usa ?>" style="display: block; cursor: pointer;"><a href="javascript:void(0);">USA</a></span>
+                        <script type="text/javascript">
+                        jQuery(document).ready(function(){
+                            var overlay = jQuery('<div id="overlay"></div>');
+                           jQuery("#id-canada").click(function(){
+
+    overlay.show();
+overlay.appendTo(document.body);
+var lc = "<?php echo $baseUrl; ?>?___store=furnishplex";
+jQuery(".p-continue").attr('id','p-continue-canada');
+jQuery("#check-cart-popup").show();
+});
+                           
+                           
+jQuery("#id-usa").click(function(){
+    
+    
+
+    overlay.show();
+overlay.appendTo(document.body);
+jQuery(".p-continue").attr('id','p-continue-usa');
+jQuery("#check-cart-popup").show();
+                         });
+
+jQuery('.p-cancel').live('click',function(){
+    jQuery("#check-cart-popup").hide();
+    overlay.remove();
+    
+});
+  jQuery('#p-continue-usa').live('click',function(){
+    
+    jQuery.ajax({
+
+  type: "GET",
+
+  url: jQuery("#baseurl").val() + "multisuppliersmarketplace/index/emptycart/",
+})
+  .done(function( msg ) {
+    if(msg == "ok")
+    {
+        //alert(jQuery(this).attr('rel'));
+       window.location.href = "<?php echo $baseUrl; ?>?___store=furnishplex_usa";  
+    }else{
+        return false;
+    }
+  
+  });
+     
+});                      
+                        
+   jQuery('#p-continue-canada').live('click',function(){
+    
+    jQuery.ajax({
+
+  type: "GET",
+
+  url: jQuery("#baseurl").val() + "multisuppliersmarketplace/index/emptycart/",
+})
+  .done(function( msg ) {
+    if(msg == "ok")
+    {
+        //alert(jQuery(this).attr('rel'));
+       window.location.href = "<?php echo $baseUrl; ?>?___store=furnishplex";  
+    }else{
+        return false;
+    }
+  
+  });
+     
+});
+});
+</script>
+                        
+                        <?php else: ?>
+                        <span class="location-country" style="display: block; line-height: 10px;cursor: pointer;" rel="CA"><a href="<?php echo $baseUrl; ?>?___store=furnishplex">CANADA</a></span>
+     <span class="" style="display: block; cursor: pointer;" rel="US"><a href="<?php echo $baseUrl; ?>?___store=furnishplex_usa">USA</a></span>
+                        <?php endif; ?>
+                        </div>                 
+
+                    </li>
+
+                    </ul>
+                    </div>
+
+ <?php //print $this->getLayout()
+//                 ->createBlock("multisuppliers/form_register")
+//                 ->setTemplate("page/html/location.phtml")
+//                 ->toHtml(); ?>
+ 
+ </div>
+ <div style="display: none;">
+<?php
+//Mage::getModel('core/cookie')->set('testcookiecategory', 'testvalue');//setcookie('testcookie', "testvalue");       
+
+    //if (Mage::getModel('core/cookie')->get('testcookiecategory') != "") {
+        
+       // if(Mage::getModel('core/cookie')->get('categorycookie') != ""){
+           // $catcookies = strtoupper(Mage::getModel('core/cookie')->get('categorycookie'));
+       // }else{
+        //    $catcookies = "MAN";
+       // }
+        //Mage::getModel('core/cookie')->get('categorycookie', $oldlocationarray[0]);
+       // }else{
+        //    $catcookies = "MAN";
+       // }
+ ?>
+<input id="category-cookie-side" type="hidden" value="<?php echo($catcookies); ?>" />
+<input id="colorattribute" value="<?php $attribute_code = "color"; 
+$attribute_details =
+Mage::getSingleton("eav/config")->getAttribute('catalog_product',$attribute_code);
+$attribute = $attribute_details->getData();
+echo $attribute['attribute_id']; ?>" type="hidden" readonly="true" />
+<script type='text/javascript'>
+
+var ps = jQuery.noConflict();
+
+ps(document).ready(function() {
+  
+  
+  ps('.dropdown-toggle').each(function(){
+       
+      ps(this).removeClass('cover');
+      });
+  
+  ps(".level0").each(function(){
+   ps(this).find('a').css("margin-bottom", "0px");
+  });
+    
+    var hoveritem = ps("hgroup.heading-name");
+    //var link =  hoveritem.find('a').attr('href');
+    ps('.sale').each(function(){
+       
+       var link = ps(this).find(hoveritem).find('a').attr('href');
+       ps(this).append('<a href="'+link+'" class="img-overlay" style="width:100%; height:100%;position:absolute; top:0px;left:0px; background:transparent; opacity:1;   z-index:99;transition-delay: 0s; transition-duration: 0.5s;transition-property: all;transition-timing-function: ease-out; "></a>');
+   
+    });
+    ps('.sale').each(function(){
+        ps(this).bind('mouseenter', function() {
+            ps(this).find(ps(".img-overlay")).css( "background", "black" );
+        ps(this).find(ps(".img-overlay")).css( "opacity", "0.6" );
+         ps(this).find(hoveritem).css( "background", "transparent" );
+        ps(this).find(hoveritem).css( "opacity", "1" );
+    });
+      ps(this).bind('mouseleave', function() {
+        ps(this).find(ps(".img-overlay")).css( "background", "transparent" );
+        ps(this).find(ps(".img-overlay")).css( "opacity", "1" );
+        ps(this).find(hoveritem).css( "background-color", "#000000" );
+        ps(this).find(hoveritem).css( "opacity", "0.7" );
+    });  
+    });
+    ps('.level-top').each(function(){
+        
+      ps(this).find(ps(".caret")).removeClass('caret'); 
+    });
+     ps('.level10 .level1 a span').each(function(){
+        
+      ps(this).css("font-family", "Arial"); 
+    });
+    ps('.level10 .level1 a').each(function(){
+        
+      ps(this).css("margin-bottom", "0px"); 
+    });
+    
+    ps(".user-menu .dropdown-4col .level0-wrapper2 .grid12-9").each(function(){
+        ps(this).css( "float", "right" );
+    }) ;
+     ps(".user-menu .dropdown-4col .level0-wrapper2 .std").each(function(){
+        ps(this).css( "float", "right" );
+    }) ;
+    //ps(".user-menu .dropdown-4col .level0-wrapper2 .std").css( "float", "right" );
+    ps("#nav li.level0").mouseenter(function(){ps(this).find('a').first().css("max-height", "32px");
+    ps(this).find('a').first().css("border-bottom", "4px #3ba2db solid");ps(this).find('a').first().css("height", "40px");});
+    
+    ps("#nav li.level0").mouseleave(function(){ps(this).find('a').first().css("max-height", "32px");
+    ps(this).find('a').first().css("border-bottom", "none");});
+    //ps(".user-menu .dropdown-4col .level0-wrapper2 .std").addClass('grid12-10');
+    
+    ps(".user-menu .dropdown-4col .level0-wrapper2").each(function(){
+        //ps(this).find(ps(".itemgrid-1col")).first().prepend('<h4 style="margin-top:10px; color:black;">Clothing</h4>');
+        ps(this).find(ps(".itemgrid-1col")).first().removeClass('grid12-3');
+        ps(this).find(ps(".itemgrid-1col")).first().addClass('grid12-2');
+    });
+    //ps(".user-menu .dropdown-4col .level0-wrapper2 .itemgrid-1col").first().prepend('<h4 style="margin-top:10px; color:black;">Clothing</h4>');
+//    ps(".user-menu .dropdown-4col .level0-wrapper2 .itemgrid-1col").first().removeClass('grid12-3');
+//    ps(".user-menu .dropdown-4col .level0-wrapper2 .itemgrid-1col").first().addClass('grid12-2');
+//    
+ ps(".imageclick"+(ps('#attribute'+ps("#colorattribute").val()+' :selected').text()).replace(/\s/g, '')).first().click();
+    if(ps("#attribute"+ps("#colorattribute").val()+" option").size() == 1){
+    var optionValue = (ps('#attribute'+ps("#colorattribute").val()+' :selected').text()).replace(/\s/g, '');
+       ps("#attribute"+ps("#colorattribute").val()).hide();
+        ps("#attribute"+ps("#colorattribute").val()).parent().append('<strong style="font-size: 14px;text-transform: uppercase;">'+optionValue+'</strong>'); 
+       
+    }
+    
+  ps( ".block-vertnav .block-content .accordion>li>a>span").each(function(){
+    if( ps(this).text() == ps("#category-cookie-side").val())
+    {
+      ps(this).parent().next().next().show(); 
+      ps(this).parent().parent().addClass('active'); 
+    }
+  });   
+//if( ps(".block-vertnav .block-title strong span").text() == "Main Categories")
+//{
+//    ps( ".block-vertnav .block-title strong span" ).text("Shop For"); 
+//}else{
+//    var items = ps( ".block-vertnav .block-title strong span" ).text().split(':');
+//    ps( ".block-vertnav .block-title strong span" ).text("Shop By: "+items[1]);
+//}
+   
+
+
+
+if(ps('#colorimages').css('opacity') == "1"){
+    ps('#colorimages img').css('cursor', 'pointer'); 
+}
+
+if(ps("#colorimages").attr( "selectboxes" ) == "1"){
+   ps('#colorimages').css('opacity', '1'); 
+}else{
+   ps('#colorimages').css('opacity', '0.25'); 
+}
+var prevselectbox = ps("#colorimages").attr( "selectboxes" ) - 1;
+ps( "select[selectboxes= "+prevselectbox+"]" ).change(function() {
+    if(ps(this).val() !="")
+    {
+       ps('#colorimages').css('opacity', '1');  
+    }else{
+       ps('#colorimages').css('opacity', '0.25'); 
+    }
+});
+
+//ps('.imageclick').click(function(){
+//   ps(this).find('img').click(); 
+//});
+
+
+ps('.imageclick').each(function(){
+    if(ps(this).attr('rel') == ps("#attribute"+ps("#colorattribute").val()).val() )
+    {
+        //if(ps('#colorimages').css('opacity') == "1"){
+ps('#colorimages img').css('border', 'solid 1px #e5e5e5'); 
+ps('#colorimages img').css('opacity', '0.6'); 
+ps(this).find('img').css('border', 'solid 1px black'); 
+ps(this).find('img').css('opacity', '1');
+
+var optionValueTexts = (ps('#attribute'+ps("#colorattribute").val()+' :selected').text()).replace(/\s/g, '');
+        ps(".imageclick"+optionValueTexts).first().click();
+}
+});
+ps('.imageclick').click(function(){
+   if(ps('#colorimages').css('opacity') == "1"){
+    var prevselectbox = ps("#colorimages").attr( "selectboxes" );
+    var thisselectlaue = ps(this).attr( "rel" );
+ps( "select[selectboxes= "+prevselectbox+"]" ).val(thisselectlaue);
+ps( "select[selectboxes= "+prevselectbox+"]" ).change();
+ps('#colorimages img').css('border', 'solid 1px #e5e5e5'); 
+ps('#colorimages img').css('opacity', '0.6'); 
+ps(this).find('img').css('border', 'solid 1px black'); 
+ps(this).find('img').css('opacity', '1');
+   }
+});
+ps('.location').mouseenter(function(){
+    ps("#location-flex-popup").show();
+ps(this).css('background-color', '#3ba2db');
+
+});
+
+ps('.location').mouseleave(function(){
+    ps("#location-flex-popup").hide();
+ps(this).css('background-color', 'transparent');
+
+});
+
+
+
+ps('#location-flex-popup').mouseenter(function(){
+    ps("#location-flex-popup").show();
+ps(this).parent().css('background-color', '#3ba2db');
+
+});
+
+ps('#location-flex-popup').mouseleave(function(){
+    ps("#location-flex-popup").hide();
+ps('.location').css('background-color', 'transparent');
+
+});
+
+
+
+//ps('#country_id_ajax').mouseenter(function(){
+//    ps("#location-flex-popup").show();
+//ps('.location').css('background-color', '#3ba2db');
+//
+//});
+//
+//ps('#country_id_ajax').mouseleave(function(){
+//    ps("#location-flex-popup").show();
+//ps(this).parent().css('background-color', '#3ba2db');
+//
+//});
+//
+//
+//ps('#region_id_ajax').mouseenter(function(){
+//    ps("#location-flex-popup").show();
+//ps(this).parent().css('background-color', '#3ba2db');
+//
+//});
+//
+//ps('#region_id_ajax').mouseleave(function(){
+//    ps("#location-flex-popup").show();
+//ps(this).parent().css('background-color', '#3ba2db');
+//});
+
+
+ps("#attribute"+ps("#colorattribute").val()).change(function() {
+    var optionValueText = (ps('#attribute'+ps("#colorattribute").val()+' :selected').text()).replace(/\s/g, '');
+    if(ps(this).val() != "")
+    {
+    //alert(".imageclick"+optionValueText);
+        ps(".imageclick"+optionValueText).first().click();
+        if(ps(document).scrollTop() != 110){
+        ps('html, body').animate({
+    scrollTop: "110px"
+}, 900);}
+    }
+    });
+    
+    
+    
+    
+// menu jquery image change
+var catid = "1519";
+ps('div.bx-viewport').hide();
+
+ps(".nav ul li a").mouseenter(function(){
+    var object = ps(this);
+    var strsplit = object.parent().attr('class').split(' ');
+    var catname = ps.trim(ps(this).find('span').text());
+    if (ps('#'+strsplit[1]).length > 0 ) {
+        ps('div.bx-viewport').hide();
+        ps('#'+strsplit[1]).show();
+	
+    }else{
+        ps('div.bx-viewport').hide();
+      ps.ajax({
+    
+    
+  type: "GET",
+  
+  url: ps("#baseurl").val() + "multisuppliersmarketplace/brand/getcategorycats?viewid="+strsplit[1]+"&catname="+ encodeURIComponent(catname),
+
+})
+
+  .done(function( msg ) {
+   var obj = ps.parseJSON(msg);
+    var strr = obj.outputHtml;
+    //console.log(strr);
+    var str = strr.split("psolz");
+    //object.parent().attr('class');
+    //console.log(object.parent().attr('class'));
+    
+    var strsplit = object.parent().attr('class').split(' ');
+   // console.log(strsplit[1]);
+    var divObj = object.parent().parent().parent().parent().attr('class');
+    ps(object.next().find('.level0-wrapper2').find('.nav-block-right').find('.cat-img')).append(str[0]);
+    
+    ps('#'+strsplit[1]).show();    
+  });  
+    }
+    
+     
+});
+
+ps(".nav-block ul li a").mouseenter(function(){
+    var object = ps(this);
+    var strsplit = object.parent().attr('class').split(' ');
+    var catname = ps.trim(ps(this).find('span').text());
+    if (ps('#'+strsplit[1]).length > 0 ) {
+        ps('div.bx-viewport').hide();
+        ps('#'+strsplit[1]).show();
+	
+    }else{
+        ps('div.bx-viewport').hide();
+      ps.ajax({
+    async:false,
+  type: "GET",
+  
+  url: ps("#baseurl").val() + "multisuppliersmarketplace/brand/getcategorycats?viewid="+strsplit[1]+"&catname="+ encodeURIComponent(catname),
+})
+
+  .done(function( msg ) {
+   var obj = ps.parseJSON(msg);
+    var strr = obj.outputHtml;
+    //console.log(strr);
+    var str = strr.split("psolz");
+    //object.parent().attr('class');
+    //console.log(object.parent().attr('class'));
+    
+    var strsplit = object.parent().attr('class').split(' ');
+    //console.log(strsplit[1]);
+    var divObj = object.parent().parent().parent().parent().attr('class');
+    //if((object.parent().parent().parent().parent() +' > div > div.cat-img > div.bx-viewport')).islevel0-wrapper2
+    
+    //if (ps(object.parent().parent().parent().parent().find('.cat-img')).length > 0 ) {
+       ps(object.parent().parent().parent().parent().find('.cat-img')).append(str[0]);
+    //}else{
+//      ps(object.next().find('level0-wrapper2').find('.cat-img')).append(str[0]);  
+//    }
+    
+    ps('#'+strsplit[1]).show();    
+  });  
+    }
+    
+     
+});
+
+if(ps(window).width() < 767){
+ps(".dropdown-toggle > .feature-icon-hover > span").removeClass('icon');
+ps(".dropdown-toggle >.feature-icon-hover > span").removeClass('i-cart');
+ps(".dropdown-toggle >.feature-icon-hover > span").first().text('CART');
+}
+if(ps(window).width() > 767){
+ps(".dropdown-toggle >.feature-icon-hover > span").removeClass('icon');
+ps(".dropdown-toggle >.feature-icon-hover > span").removeClass('i-cart');
+ps(".dropdown-toggle >.feature-icon-hover > span").first().text('');
+}
+//---------------------------//
+
+
+
+ps(".adjicon_icon_config").click(function(){
+    ps(".adjicon_icon_config").each(function(){
+      ps(this).css('border', '0px solid black');
+      ps(this).removeClass('adjselected');  
+    });
+    ps(this).removeClass('adjselected');
+    ps(this).css('border', '1px solid black');
+ps(this).css('cursor', 'pointer');
+ ps("#product-options-wrapper dl dd .input-box select").val(ps(this).attr('id')).change();
+//ps('.adjprice').text(ps('#'+ps(this).attr('id')+' > img').attr('title'));
+    
+});
+
+
+
+});
+</script></div>
+
+ <div class="logo-wrapper <?php echo "grid12-2"; ?>">
+                    <?php if ($this->getIsHomePage()): ?>
+                        <h1 class="logo"><strong><?php echo $this->getLogoAlt() ?></strong><a href="<?php echo $this->getUrl('') ?>" title="<?php echo $this->getLogoAlt() ?>"><img width="151" height="149" src="<?php echo $this->getLogoSrc() ?>" alt="<?php echo $this->getLogoAlt() ?>" /></a></h1>
+                    <?php else: ?>
+                        <a href="<?php echo $this->getUrl('') ?>" title="<?php echo $this->getLogoAlt() ?>" class="logo"><strong><?php echo $this->getLogoAlt() ?></strong><img src="<?php echo $this->getLogoSrc() ?>" width="151" height="149" alt="<?php echo $this->getLogoAlt() ?>" /></a>
+                    <?php endif; ?>
+                    </div>
+                <?php if ($tmpHtml = $this->getChildHtml('block_header_top_left')): ?>
+                    <div class="block_header_top_left item item-left"><?php echo $tmpHtml; ?></div>
+                <?php endif; ?>
+                <?php if ($tmpHtml = $this->getChildHtml('block_header_top_left2')): ?>
+                    <div class="block_header_top_left2 item item-left"><?php echo $tmpHtml; ?></div>
+                <?php endif; ?>
+                <div class="item item-left hide-below-960">
+                    <p class="welcome-msg"><?php echo $this->getChildHtml('welcome'); //$this->getWelcome(); ?> <?php echo $this->getAdditionalHtml(); ?></p>
+                </div>
+                
+                <?php if ($tmpHtml = $this->getChildHtml('block_header_top_right')): ?>
+                    <div class="block_header_top_right item item-right"><?php echo $tmpHtml; ?></div>
+                <?php endif; ?>
+                <?php echo $this->getChildHtml('currency'); ?>
+                <?php echo $this->getChildHtml('store_language'); ?>
+                <?php if ($tmpHtml = $this->getChildHtml('block_header_top_right2')): ?>
+                    <div class="block_header_top_right2 item item-right"><?php echo $tmpHtml; ?></div>
+                <?php endif; ?>
+                
+                <?php if (isset($p['rightColBreak'][0])) echo $p['rightColBreak'][0]; ?>
+
+                        <?php //Cart drop-down
+                            echo $this->getChildHtml('cart_sidebar'); ?>
+ <?php if (isset($p['rightColBreak'][4])) echo $p['rightColBreak'][4]; ?>
+                        <div class="top-links links-wrapper-separators-left">
+
+                            <?php
+                            //Compare drop-down
+                            //if ($theme->getCfg('header/compare') && ($tmpHtml = $this->getChildHtml('compareMini')))
+                            //    echo $tmpHtml;
+
+                            //Additional custom Top Links
+                            if ($tmpHtml = $this->getChildHtml('block_header_top_links2'))
+                                echo $tmpHtml;
+
+                            //Default Magento top links (page.xml)
+                            if ($theme->getCfg('magento_blocks/top_links'))
+                                echo $this->getChildHtml('topLinks');
+
+                            //Custom top links - override Magento's default Top Links
+                            if ($tmpHtml = $this->getChildHtml('block_header_top_links'))
+                                echo $tmpHtml;
+                            ?>
+                        </div> <!-- end: top-links -->
+ 
+ <div id="ship_usa_canada" class="grid12-8" style="position: relative; float: right; margin: 0px;">
+ <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('free_shipping')->toHtml(); 
+?> 
+
+</div>                       
+<div id="search_button" class="grid12-8" style=" position: relative; float: right; height: 48px;"><?php if (isset($p['rightCol'][0])): ?>
+                            
+                            
+
+                            
+                            
+                            
+                            <div class="search-wrapper-p0 <?php echo $searchClasses; ?>"><?php echo $p['rightCol'][0]; ?></div>
+                        <?php endif; ?></div>
+
+<div id="responsive-menu-new" style="float: right;margin-right: -8px;" class="grid12-10">
+
+                <div class="header-main v-grid-container">
+
+                    
+
+                    <?php if ($centralColUnits): ?>
+                    <div class="search-wrapper-centered clearer v-grid <?php echo $centralColGridClass; ?> <?php echo $searchClasses; ?>">
+                        <?php echo $p['centralCol'][0]; ?>
+                    </div>
+                    <?php endif; ?>
+
+                    <div style="position: relative;" class="user-menu clearer v-grid <?php echo $rightColGridClass; ?>">
+
+
+<div class="nav-container">
+        <div class="nav grid12-12 clearer<?php if($navCss) echo " " . implode(" ", $navCss); ?>">
+            <?php echo $this->getChildHtml('topMenu') ?>
+        </div> <!-- end: nav -->
+    </div> <!-- end: nav-container -->
+                        
+
+                        
+
+                        <?php if (isset($p['rightColBreak'][1])) echo $p['rightColBreak'][1]; ?>
+
+                        <?php if (isset($p['rightCol'][1])): ?>
+                            <div class="search-wrapper-p1 <?php echo $searchClasses; ?>"><?php echo $p['rightCol'][1]; ?></div>
+                        <?php endif; ?>
+                        
+                        <?php if (isset($p['rightColBreak'][2])) echo $p['rightColBreak'][2]; ?>
+
+                        <?php //Compare drop-down
+                        if ($theme->getCfg('header/compare') && ($tmpHtml = $this->getChildHtml('compareMini')))
+                            echo $tmpHtml;
+                        ?>
+
+                        <?php if (isset($p['rightColBreak'][3])) echo $p['rightColBreak'][3]; ?>
+
+                        <?php if (isset($p['rightCol'][2])): ?>
+                            <div class="search-wrapper-p2 <?php echo $searchClasses; ?>"><?php echo $p['rightCol'][2]; ?></div>
+                        <?php endif; ?>
+
+                        <?php if (isset($p['rightColBreak'][5])) echo $p['rightColBreak'][5]; ?>
+
+                        <?php if (isset($p['rightCol'][3])): ?>
+                            <div class="search-wrapper-p3 <?php echo $searchClasses; ?>"><?php echo $p['rightCol'][3]; ?></div>
+                        <?php endif; ?>
+
+                    </div> <!-- end: user-menu -->
+                    
+                </div> <!-- end: v-grid-container -->
+            </div> <!-- end: grid-full -->
+            <?php echo $this->getChildHtml('topContainer'); ?>
+        </div> <!-- end: header-top -->
+    </div> <!-- end: header-top-container -->
+
+    <!--<div class="header-primary-container">
+        <div class="header-primary header container<?php if($headerCss) echo " " . implode(" ", $headerCss); ?>">
+            
+
+            </div> <!-- end: grid-full -->
+        <!--</div> --> <!-- end: header-primary -->
+    </div> <!-- end: header-primary-container -->
+
+    
+
+</div> <!-- end: header-container3 -->
+</div> <!-- end: header-container2 -->
+</div> <!-- end: header-container -->

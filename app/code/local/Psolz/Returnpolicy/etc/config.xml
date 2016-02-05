@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Psolz_Returnpolicy>
+            <version>0.1.6</version>
+        </Psolz_Returnpolicy>
+    </modules>
+    <frontend>
+        <routers>
+            <Returnpolicy>
+                <use>standard</use>
+                <args>
+                    <module>Psolz_Returnpolicy</module>
+                    <frontName>returnpolicy</frontName>
+                </args>
+            </Returnpolicy>
+        </routers>
+        <layout>
+            <updates>
+                <returnpolicy>
+                    <file>returnpolicy.xml</file>
+                </returnpolicy>
+            </updates>
+        </layout>
+    </frontend>   
+    <global>
+        <models>
+            <returnpolicy>
+                <class>Psolz_Returnpolicy_Model</class>
+                <resourceModel>returnpolicy_mysql4</resourceModel>
+            </returnpolicy>
+            <returnpolicy_mysql4>
+                <class>Psolz_Returnpolicy_Model_Mysql4</class>
+                <entities>
+                    <returnpolicy>
+                        <table>returnpolicy</table>
+                    </returnpolicy>
+                </entities>
+            </returnpolicy_mysql4>
+        </models>
+        <resources>
+            <returnpolicy_setup>
+                <setup>
+                    <module>Psolz_Returnpolicy</module>
+                    <class>Mage_Sales_Model_Mysql4_Setup</class>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </returnpolicy_setup>
+            <returnpolicy_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </returnpolicy_write>
+            <returnpolicy_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </returnpolicy_read>
+        </resources>
+        <blocks>
+            <returnpolicy>
+                <class>Psolz_Returnpolicy_Block</class>
+            </returnpolicy>
+        </blocks>
+        <helpers>
+            <returnpolicy>
+                <class>Psolz_Returnpolicy_Helper</class>
+            </returnpolicy>
+        </helpers>
+        
+       <fieldsets>
+        <sales_convert_quote>                           
+            <lead_status><to_order>*</to_order></lead_status>
+        </sales_convert_quote>
+
+        <sales_convert_order>                                              
+            <lead_status><to_order>*</to_order></lead_status>
+        </sales_convert_order>
+    </fieldsets>
+        
+        
+        
+    </global>
+    <admin>
+        <routers>
+         <returnpolicy>
+            <use>admin</use>
+            <args>
+               <module>Psolz_Returnpolicy</module>
+               
+            </args>
+         </returnpolicy> 
+        </routers>
+    </admin>
+    <adminhtml>
+        <menu>
+            <returnpolicy translate="title" module="returnpolicy">
+                <title>Return Policy</title>
+                <sort_order>71</sort_order>               
+                <children>
+                    <item>
+                        <title>List Return Policy</title>
+                        <sort_order>0</sort_order>
+                        <action>returnpolicy/adminhtml_returnpolicy</action>
+                    </item>
+                    <item1>
+                                <title>Add New</title>
+                                <sort_order>0</sort_order>
+                                <action>returnpolicy/adminhtml_returnpolicy/new</action>
+                            </item1>
+                </children>
+            </returnpolicy>
+        </menu>
+        <acl>
+        <resources>
+            <all>
+                <title>Allow Everything</title>
+            </all>
+            <admin>
+                <children>
+                            <item>
+                                <title>Index</title>
+                                <sort_order>0</sort_order>
+                                <action>returnpolicy/adminhtml_returnpolicy</action>
+                            </item>
+                            <item>
+                                <title>Add New</title>
+                                <sort_order>0</sort_order>
+                                <action>returnpolicy/adminhtml_returnpolicy/new</action>
+                            </item>
+                </children>
+            </admin>
+        </resources>   
+    </acl>
+    
+    </adminhtml>
+</config>

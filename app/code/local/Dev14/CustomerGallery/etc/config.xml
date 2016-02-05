@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Dev14_CustomerGallery>
+            <version>0.1.0</version>    <!-- Version of module -->
+        </Dev14_CustomerGallery>
+    </modules>
+
+    <frontend>
+        <routers>
+            <customergallery>
+                <use>standard</use>
+                <args>
+                    <module>Dev14_CustomerGallery</module>
+                    <frontName>customer_gallery</frontName>
+                </args>
+            </customergallery>
+        </routers>
+         <layout>
+            <updates>
+                <customergallery>
+                    <file>customergallery.xml</file> <!-- Our layout file name-->
+                </customergallery>
+            </updates>
+         </layout>
+    </frontend>
+
+       <adminhtml>
+
+        <routers>
+
+            <customergallery>
+
+                <use>admin</use>
+
+                <args>
+
+                    <module>Dev14_CustomerGallery</module>
+
+                    <frontName>customergallery</frontName>
+
+                </args>
+
+            </customergallery>
+
+        </routers>
+        <layout>
+        <updates>
+            <customergallery>
+                <file>customergallery.xml</file>
+            </customergallery>
+        </updates>
+    </layout>
+    
+    </adminhtml>
+
+      <admin>
+
+      <routers>
+
+            <adminhtml>     
+
+            <use>admin</use>           
+
+                <args>
+
+                    <modules>
+
+                        <Dev14_CustomerGallery before="Mage_Adminhtml">Dev14_CustomerGallery_Adminhtml</Dev14_CustomerGallery>
+
+                    </modules>                    
+
+                </args>
+
+            </adminhtml>
+
+      </routers>
+
+  </admin>
+
+
+
+<global>
+    <!-- ... -->
+   
+    <models>
+        <customergallery>
+            <class>Dev14_CustomerGallery_Model</class>
+            <resourceModel>customergallery_resource</resourceModel>
+        </customergallery>
+        
+        <customergallery_resource>
+            <class>Dev14_CustomerGallery_Model_Resource</class>
+            <entities>
+                <gallery>
+                    <table>customer_gallery</table>
+                </gallery>
+                 <galleryimages>
+                    <table>customer_gallery_images</table>
+                </galleryimages>
+            </entities>
+        </customergallery_resource>
+    </models>
+    <!-- ... -->
+
+     <helpers>
+                <customergallery>
+                    <class>Dev14_CustomerGallery_Helper</class>
+                </customergallery>
+            </helpers>
+            <blocks>
+                <customergallery>
+                    <class>Dev14_CustomerGallery_Block</class>
+                </customergallery>
+            </blocks>
+    
+</global>
+    </config>

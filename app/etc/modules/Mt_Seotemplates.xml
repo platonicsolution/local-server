@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Mt_Seotemplates>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Mt_Seotemplates>
+    </modules>
+</config>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <CreteSol_OrderAttributes>
+            <active>true</active>
+            <codePool>local</codePool>
+        </CreteSol_OrderAttributes>
+    </modules>
+</config>

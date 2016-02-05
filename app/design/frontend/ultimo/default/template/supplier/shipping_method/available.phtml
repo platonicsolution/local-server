@@ -1,0 +1,282 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php /** @var $this Mage_Checkout_Block_Onepage_Shipping_Method_Available */ ?>
+<?php 
+$baseCurrencyCode = Mage::app()->getStore()->getBaseCurrencyCode();
+$currentCurrencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
+$quote = Mage::getSingleton('checkout/session')->getQuote();
+        $cartItems = $quote->getAllVisibleItems();
+        foreach ($cartItems as $item)
+        {
+            $my_product_array[] = $item->getProductId();
+        }
+$users = Mage::getModel( 'multisuppliers/productscollect' )
+					->getCollection()
+					->addFieldToSelect( 'user_id' )
+					 ->addFieldToFilter('product_id', array(
+					'in' => array( $my_product_array )))
+					->load();
+
+foreach($users as $us)
+{
+    $my_user_array[] = $us->getData('user_id');
+}
+$collection = Mage::getModel('multisuppliers/multisuppliers')->getCollection()->addFieldToSelect('*')->addFieldToFilter('userid', array(
+					'in' => array( $my_user_array )));
+ ?>
+<?php 
+
+
+foreach($collection as $col)
+{
+    $jsonencodeshpmethodarray[$col->getData('userid')] = json_decode($col->getData('shippingmethod'));
+}
+//foreach($jsonencodeshpmethodarray as $userid =>$tst){
+//    $newtst=array();
+//    foreach($tst as $t)
+//    {
+//     $newtst[]=$t; 
+//    }
+//    print_r($newtst);
+//    }exit;
+//print_r($jsonencodeshpmethodarray);
+//exit;
+?>
+<?php  ?>
+<?php if (!$_shippingRateGroups){ ?>
+<dl class="sp-methods">
+<ul class="form-list">
+<?php if(count($jsonencodeshpmethodarray) > 1){
+    echo("<li><label>AS the Products selected Belongs to different suppliers so you have to Select shipping method against each supplier </label></li>");
+}
+
+ ?>
+
+<?php foreach($jsonencodeshpmethodarray as $userid =>$tst){
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+ $myitems = Mage::getModel( 'multisuppliers/productscollect' )
+					->getCollection()
+					->addFieldToSelect('product_id')
+					 ->addFieldToFilter('user_id',$userid)
+					->load();   
+$mycartitems = array();  
+  foreach($myitems as $it)
+{
+    $mycartitems[] = $it->getData('product_id');
+    
+}  
+    
+    
+    
+    
+    
+    $myshippingmethod = Mage::getModel( 'multisuppliers/multisuppliers' )
+					->getCollection()
+					->addFieldToSelect( '*' )
+					 ->addFieldToFilter('userid',$userid )
+					->load();
+$mysupplierid="";                    
+foreach($myshippingmethod as $sm)
+{
+    $myshipmethod = $sm->getData('shippingmethod');
+    $mysuppliercountry = $sm->getData('country_id');
+    $mysupplierpostalcode = $sm->getData('postalcode');
+    $mysupplierid = $sm->getData('supplier_id');
+}
+
+$shippingPrice = array();
+foreach(json_decode($myshipmethod) as $shp)
+{
+       $shippingPrice[$shp->value] = $shp->price;
+    
+}
+    
+    
+$quote = Mage::getSingleton('checkout/session')->getQuote();
+        $cartItems = $quote->getAllVisibleItems();
+        foreach ($cartItems as $item)
+        {
+            $my_product_array[] = $item->getProductId();
+            $qty_array[$item->getProductId()][$item->getId()]=$item->getQty();
+            $weight_array[$item->getProductId()]=$item->getWeight() * $item->getQty();
+            $subtotal_array[$item->getProductId()]=$item->getRowTotalInclTax();
+        }    
+    
+    
+    
+ $myitems = Mage::getModel( 'multisuppliers/productscollect' )
+					->getCollection()
+					->addFieldToSelect( 'product_id' )
+					 ->addFieldToFilter('user_id',$userid )
+					->load();
+$quotequantity = array();
+$quoteweight = array();
+$quotetotal = array();
+foreach($myitems as $it)
+{
+    if(in_array($it->getData('product_id'),$my_product_array)){
+    $quotequantity[] = array_sum($qty_array[$it->getData('product_id')]);
+    $quoteweight[] = $weight_array[$it->getData('product_id')];
+    $quotetotal[] = $subtotal_array[$it->getData('product_id')];
+    
+}   }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    //echo($shippingPrice);
+//    echo(array_sum($quotequantity));
+//    echo(array_sum($quoteweight));
+//    echo($mysuppliercountry);
+//    echo($mysupplierpostalcode);
+        Mage::register('supplier_id', $mysupplierid);
+        Mage::getSingleton('core/session')->setMyID($mysupplierid);
+        Mage::register('quote_cost', array_sum($quotetotal));
+        Mage::register('shipping_quantity', array_sum($quotequantity));
+        Mage::register('shipping_weight',array_sum($quoteweight));
+        Mage::register('supplier_countryid',$mysuppliercountry);
+        Mage::register('supplier_postalcode',$mysupplierpostalcode);
+        Mage::getSingleton('core/session')->setMyCart($mycartitems);
+        Mage::getSingleton('core/session')->setMyshippingmethod($shippingPrice);
+        $_shippingRateGroups = $this->getShippingRates();    
+    $newtst=array();
+    foreach($tst as $t)
+    {
+     $newtst[]=$t; 
+    }
+    ?>
+    <li>
+    <div style="border: solid 1px #E4E4E4;padding: 6px;margin: 10px 0px;">
+    <table id="checkout-review-table" class="data-table">
+                <colgroup><col>
+        <col width="1">
+        <col width="1">
+        <col width="1">
+                </colgroup><thead>
+            <tr class="first last">
+                <th rowspan="1">Product Name</th>
+                <th class="a-center" rowspan="1">Qty</th>
+                <th class="a-center" colspan="1">Subtotal</th>
+            </tr>
+                    </thead>
+<?php
+$my_product_array=array();
+$username = Mage::getModel('admin/user')->getCollection()->addFieldToFilter('user_id',$userid)->load();
+foreach($username as $us){
+    $uname=$us->getData('username');
+}
+
+echo('<li><label>Below are the products form supplier "' . $uname .'" Kindly select the shipping methid for this</label></li>');
+$products = Mage::getModel( 'multisuppliers/productscollect' )
+					->getCollection()
+					->addFieldToSelect( 'product_id' )
+					 ->addFieldToFilter('user_id',$userid)
+					->load(); 
+foreach($products as $pr)
+{
+    $my_product_array[] =$pr->getData('product_id');
+}
+$quoteitem = Mage::getSingleton('checkout/session')->getQuote()->getAllVisibleItems();
+$subtotal=array();
+$qtytotal = array();
+foreach($quoteitem as $qt)
+{?><tbody><?php
+    if(in_array($qt->getProductId(),$my_product_array)){
+        ?>
+         <tr class="first last odd">
+    <td><h3 class="product-name"><?php echo($qt->getName()) ?></h3>
+                    </td>
+            <td class="a-center"><?php  echo($qt->getQty()) ;?></td>
+    <!-- sub total starts here -->
+        <td class="a-right last">
+                    <span class="cart-price">
+        
+                            <span class="price">
+<?php  echo Mage::app()->getLocale()->currency($currentCurrencyCode)->getSymbol().sprintf("%.2f",Mage::helper('directory')->currencyConvert($qt->getRowTotalInclTax(), $baseCurrencyCode, $currentCurrencyCode)); ?></span>            
+        </span>
+            </td>
+        </tr>
+                
+        <?php 
+        $qtytotal[] = $qt->getQty();
+        $subtotal[] =$qt->getRowTotalInclTax();
+    }?></tbody><?php
+}
+?>
+    <select style="display: block; width: 460px;margin: 5px 0px;" name="shipping_method[<?php echo $userid ?>]">
+    <?php
+foreach ($_shippingRateGroups as $code => $_rates){ 
+    foreach($newtst as $ts)
+    {
+       if($code == $ts->value){
+        foreach ($_rates as $_rate){
+            if(!$_rate->getErrorMessage()){
+            ?>
+          <option value="<?php echo $_rate->getCode() . "/" . $this->escapeHtml($this->getCarrierName($code)) . "-" . $this->escapeHtml($_rate->getMethodTitle()) . "/" . $code . "/" . $ts->price . "/" . $_rate->getPrice()?>">
+          <?php $_excl =$this->getShippingPrice($_rate->getPrice(), $this->helper('tax')->displayShippingPriceIncludingTax());?> 
+                        <?php $_incl = $this->getShippingPrice($_rate->getPrice(), true); ?>
+                        <?php echo $this->escapeHtml($this->getCarrierName($code)) . "-" . $this->escapeHtml($_rate->getMethodTitle()) . " = " . $_excl; ?>
+                        <?php if ($this->helper('tax')->displayShippingBothPrices() && $_incl != $_excl): ?>
+                            (<?php echo $this->__('Incl. Tax'); ?> <?php echo $_incl; ?>)
+                        <?php endif; ?>
+        </option>  
+        
+         
+      
+    
+<?php }} }
+    }
+    ?>
+    <?php }
+?></select></table></div></li><?php
+Mage::unregister('supplier_id');
+Mage::unregister('quote_cost');
+Mage::unregister('shipping_quantity');
+Mage::unregister('shipping_weight');
+Mage::unregister('supplier_countryid');
+Mage::unregister('supplier_postalcode');
+Mage::getSingleton('core/session')->unsMyCart();
+Mage::getSingleton('core/session')->unsMyshippingmethod();}}Mage::getSingleton('core/session')->unsMyID();?></ul>

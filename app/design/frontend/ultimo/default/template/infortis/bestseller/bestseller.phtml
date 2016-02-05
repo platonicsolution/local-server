@@ -1,0 +1,62 @@
+<?php
+$baseCurrencyCode = Mage::app()->getStore()->getBaseCurrencyCode();
+$currentCurrencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
+
+ ?>
+<div class="box best-selling">
+<h3 class="section-title"><p><span>BEST SELLERS</span></p></h3>
+	<div class="category-products">
+		<ul class="products-grid category-products-grid itemgrid itemgrid-adaptive itemgrid-5col single-line-name centered hover-effect equal-height">
+			<?php $counter=0; foreach ($this->
+				getBestsellerProducts() as $product): ?>
+				<li class="item" style="border: none;">
+					<div style="max-width:295px;" class="product-image-wrapper">
+						<a class="product-image" title="<?php echo $this->stripTags($product->getName(), null, true); ?>" href="<?php echo $product->getProductUrl() ?>">
+						<img width="169" height="169" alt="<?php echo $this->stripTags($product->getName(), null, true); ?>" src="<?php echo $this->helper('catalog/image')->init($product, 'small_image')->resize(220); ?>"/>
+						</a>
+						<ul class="add-to-links clearer addto-links-icons addto-onimage display-onhover" style="display: none; opacity: 1;">
+							<li>
+								<a title="Add to Wishlist" href="<?php echo $this->helper('wishlist')->getAddUrl($product) ?>" class="link-wishlist">
+								<span class="icon icon-hover i-wishlist-bw"></span>
+								</a>
+							</li>
+						</ul>
+                        
+					</div>
+                    <?php $this->getChildHtml('product.list.icons'); ?>
+					<!-- end: product-image-wrapper -->
+					<h2 class="product-name">
+						<a style="color:#3ba2db;" title="<?php echo $this->stripTags($product->getName(), null, true); ?>" href="<?php echo $product->getProductUrl() ?>"><?php echo $this->stripTags($product->getName(), null, true); ?></a>
+					</h2>
+					<div>
+						<span>
+							By
+							<span style="text-transform: capitalize;">
+								<?php echo Mage::getModel('catalog/product')->load($product->getId())->getAttributeText('manufacturer'); ?>
+							</span>
+						</span>
+					</div>
+                    <div class="actions clearer display-onhover" style="padding-left: 49.5667px; bottom: 0px !important; display: none; opacity: 1;">
+						<button onclick="setLocation('<?php echo Mage::helper('checkout/cart')->getAddUrl($product) ?>')" class="button btn-cart"
+						title="Add to Cart" type="button">
+							<span>
+								<span>
+									Add to Cart
+								</span>
+							</span>
+						</button>
+					</div>
+					<div class="price-box">
+						<span id="product-price-15782" class="regular-price">
+							<span class="price">
+								<?php echo Mage::app()->getLocale()->currency(Mage::app()->getStore()->getCurrentCurrencyCode())->getSymbol().sprintf("%.2f",Mage::helper('directory')->currencyConvert($product->getPrice(), $baseCurrencyCode, $currentCurrencyCode)); ?>
+							</span>
+						</span>
+					</div>
+					
+					<!-- end: actions -->
+				</li>
+				<?php endforeach; ?>
+		</ul>
+	</div>
+</div>

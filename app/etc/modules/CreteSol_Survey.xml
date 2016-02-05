@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <CreteSol_Survey>
+            <active>true</active>
+            <codePool>local</codePool>
+        </CreteSol_Survey>
+    </modules>
+</config>

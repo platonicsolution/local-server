@@ -1,0 +1,326 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+/**
+ * Create account form template
+ *
+ * @var $this Mage_Customer_Block_Form_Register
+ */
+?>
+<div class="account-create">
+    <div class="page-title">
+        <h1><?php echo $this->__('Create an Account') ?></h1>
+    </div>
+    <form action="<?php echo $this->getPostActionUrl() ?>" method="post" id="form-validate" enctype="multipart/form-data">
+        <div class="fieldset">
+            <h2 class="legend"><?php echo $this->__('Personal Information') ?></h2>
+            <ul class="form-list">
+                <li class="fields">
+                    <?php echo $this->getLayout()->createBlock('customer/widget_name')->setObject($this->getFormData())->setForceUseCustomerAttributes(true)->toHtml() ?>
+                </li>
+                <li>
+                    <label for="email_address" class="required"><em>*</em><?php echo $this->__('Email Address') ?></label>
+                    <div class="input-box">
+                        <input type="text" name="email" id="email_address" value="<?php echo $this->escapeHtml($this->getFormData()->getEmail()) ?>" title="<?php echo $this->__('Email Address') ?>" class="input-text validate-email required-entry" />
+                    </div>
+                </li>
+                </ul>
+                </div>
+        <div class="fieldset">
+            <h2 class="legend"><?php echo $this->__('Login Information') ?></h2>
+            <ul class="form-list">
+            <li class="fields">
+                    <div class="field">
+                        <label for="username"  class="required"><em>*</em> <?php echo $this->__('Username') ?></label>
+                        <div class="input-box">
+                            <input type="text" name="username" id="username"  title="<?php echo $this->__('Username') ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('city') ?>"/>
+                        </div>
+                    </div>
+                    </li>
+                <li class="fields">
+                    <div class="field">
+                        <label for="password" class="required"><em>*</em><?php echo $this->__('Password') ?></label>
+                        <div class="input-box">
+                            <input type="password" name="password" id="password" title="<?php echo $this->__('Password') ?>" class="input-text required-entry validate-password" />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="confirmation" class="required"><em>*</em><?php echo $this->__('Confirm Password') ?></label>
+                        <div class="input-box">
+                            <input type="password" name="confirmation" title="<?php echo $this->__('Confirm Password') ?>" id="confirmation" class="input-text required-entry validate-cpassword" />
+                        </div>
+                    </div>
+                </li>
+                  
+            </ul>
+        </div>
+        <div class="fieldset">
+            <h2 class="legend"><?php echo $this->__('Contact Information') ?></h2>
+            <ul class="form-list">
+            <li class="wide">
+                    <label for="street" class="required"><em>*</em><?php echo $this->__('Street Address') ?></label>
+                    <div class="input-box">
+                        <input type="text" name="street" title="<?php echo $this->__('Street Address') ?>" id="street" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('street') ?>" />
+                    </div>
+                </li>            
+                <li class="fields">
+                    <div class="field">
+                        <label for="company"  class="required"><em>*</em> <?php echo $this->__('Company') ?></label>
+                        <div class="input-box">
+                            <input type="text" name="company" id="company"  title="<?php echo $this->__('Company') ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('city') ?>" />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="telephone" class="required"><em>*</em><?php echo $this->__('Telephone') ?></label>
+                        <div class="input-box">
+                            <input type="text" name="telephone" id="telephone" title="<?php echo $this->__('Telephone') ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('telephone') ?>" />
+                        </div>
+                    </div>
+                </li>
+                  <li class="fields">
+                    <div class="field">
+                        <label for="city" class="required"><em>*</em><?php echo $this->__('City') ?></label>
+                        <div class="input-box">
+                            <input type="text" name="city" title="<?php echo $this->__('City') ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('city') ?>" id="city" />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="region_id" class="required"><em>*</em><?php echo $this->__('State/Province') ?></label>
+                        <div class="input-box">
+                            <select id="region_id" name="region_id" title="<?php echo $this->__('State/Province') ?>" class="validate-select" style="display:none;">
+                                <option value=""><?php echo $this->__('Please select region, state or province') ?></option>
+                            </select>
+                            <input type="text" id="region" name="region" value="<?php echo $this->escapeHtml($this->getRegion()) ?>" title="<?php echo $this->__('State/Province') ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('region') ?>" style="display:none;" />
+                        </div>
+                    </div>
+                </li>
+                <li class="fields">
+                    <div class="field">
+                        <label for="zip" class="required"><em>*</em><?php echo $this->__('Zip/Postal Code') ?></label>
+                        <div class="input-box">
+                            <input type="text" name="postcode" title="<?php echo $this->__('Zip/Postal Code') ?>" id="zip" class="input-text validate-zip-international <?php echo $this->helper('customer/address')->getAttributeValidationClass('postcode') ?>" />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="country" class="required"><em>*</em><?php echo $this->__('Country') ?></label>
+                        <div class="input-box">
+                            <?php echo $this->getCountryHtmlSelect() ?>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <div class="fieldset"  id="shipping_details_tab">
+            <h2 class="legend"><?php echo $this->__('Shipping Addresses Information') ?></h2>
+            <ul class="form-list">
+            <li class="fields">
+                    <div class="field">
+                        <label > <?php echo $this->__('Country') ?></label>
+                        <div class="input-box ajaxcountry">
+<?php if (count($this->loadcountries()) > 0): ?>
+	<select class="ajaxcountryselect" id="country_1">
+		<option value="">-- Please Select --</option>
+		<?php foreach($this->loadcountries() as $_country): ?>
+			<option value="<?php echo $_country['value'] ?>">
+				<?php echo $_country['label'] ?>
+			</option>
+		<?php endforeach; ?>
+	</select>
+    
+<?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="region_id_1"><?php echo $this->__('State/Province') ?></label>
+                        <div class="input-box">
+                            <select id="region_id_1" title="<?php echo $this->__('State/Province') ?>" class="ajaxstateselect" style="display:none;">
+                                <option value=""><?php echo $this->__('Please select region, state or province') ?></option>
+                            </select>
+                            <input type="text" id="region_1"  value="<?php echo $this->escapeHtml($this->getRegion()) ?>" title="<?php echo $this->__('State/Province') ?>" class="ajaxstateselecttext input-text" style="display:none;" />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="city_ship_chk"><?php echo $this->__('Add City') ?></label><input style="margin-left: 7px;
+    margin-top: 3px;" type="checkbox" id="city_ship_chk" >
+                        <div class="input-box">
+                            <input type="text" title="<?php echo $this->__('City_ship') ?>" class=" ajaxcitytext input-text " id="city_ship" style="display:none;"  />
+                        </div>
+                    </div>
+                    <div class="field"><a style="display: block;border: solid 1px #F19900; float: left;color: #E76200;background: #F9F3E3;font-size: 13px;font-weight: bold;text-decoration: none;cursor: pointer;margin-left: 1px;
+    margin-top: 18px;padding: 0 10px;" class="add_button">ADD</a></div>
+                </li>
+                <li class="fields ps_check_boxes">
+                
+                </li>
+            </ul>
+            
+            </div>
+            <div class="fieldset">
+            <h2 class="legend"><?php echo $this->__('Shipping Methods') ?></h2>
+            <ul class="form-list">
+            <li class="fields">
+            
+            <?php
+foreach($this->getActiveShippingMethods() as $shpmethod)
+{?>
+    <input class="shipping_methods" type="checkbox" name="shippingmethod[]" value= <?php echo $shpmethod[value]?> > <?php echo $shpmethod[label] ?>  <div style="display: none;<?php if($shpmethod[value] == 'tablerate'){?>  position: relative;<?php }else{?> position: absolute; <?php } ?>"><input class="handling-fee" style="position: absolute;top: -24px;left: 259px;" type="text" name=<?php echo $shpmethod[value]?> /><?php if($shpmethod[value] == 'tablerate'){?> <select class=" select" name="condition_name" id="carriers_tablerate_condition_name">
+<option value="package_weight">Weight vs. Destination</option>
+<option selected="selected" value="package_value">Price vs. Destination</option>
+<option value="package_qty"># of Items vs. Destination</option>
+</select><button style="" onclick="setLocation('<?php $url = Mage::getBaseUrl();
+$url = explode("/" , $url);
+if (in_array('index.php', $url)) 
+{
+    unset($url[array_search('index.php',$url)]);
+}
+$url = implode("/" , $url);
+echo $url;
+?>customer_documents/'+ $('carriers_tablerate_condition_name').value + '/tablerates.csv' )" class="scalable " type="button" title="Export CSV" id="id_c01ce37c24e0a17124ab71eef2cc7e29"><span><span><span>Export CSV</span></span></span></button><input type="file" title="File" name="docname"> <?php } ?></div> <br>
+<?php }?>
+           </li>
+            </ul>
+        </div>
+        <div class="fieldset">
+            <h2 class="legend"><?php echo $this->__('Stores') ?></h2>
+            <ul class="form-list">
+            <li class="fields">
+            
+            <?php
+foreach($this->getallstores() as $stores)
+{?>
+    <input type="checkbox" name="stores[]" value= <?php echo $stores[value]?> > <?php echo $stores[label] ?>   <br>
+<?php }?>
+</li>
+            </ul>
+        </div>
+        </div>
+        <div class="buttons-set">
+            <p class="required"><?php echo $this->__('* Required Fields') ?></p>
+            <p class="back-link"><a href="<?php echo $this->escapeUrl($this->getBackUrl()) ?>" class="back-link"><small>&laquo; </small><?php echo $this->__('Back') ?></a></p>
+            <button type="submit" title="<?php echo $this->__('Submit') ?>" class="button"><span><span><?php echo $this->__('Submit') ?></span></span></button>
+        </div>
+    </form>
+    <script type="text/javascript">
+    //<![CDATA[
+        var dataForm = new VarienForm('form-validate', true);
+        new RegionUpdater('country', 'region', 'region_id', <?php echo $this->helper('directory')->getRegionJson() ?>, undefined, 'zip');
+         new RegionUpdater('country_1', 'region_1', 'region_id_1', <?php echo $this->helper('directory')->getRegionJson() ?>, undefined, 'zip');
+    //]]>
+    </script>
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>-->
+    <script type="text/javascript">
+    var ps = jQuery.noConflict();
+ps(document).ready(function() {
+    
+     ps(".shipping_methods").click(function(){
+        if(ps(this).is(':checked'))
+        {
+            if(ps(this).val() == 'flatrate' || ps(this).val() == 'tablerate' )
+            {
+            ps(this).next().find(".handling-fee").addClass("required-entry");
+            ps(this).next().find(".handling-fee").addClass("input-text");
+          ps(this).next().show();  }
+        }else{
+            ps(this).next().find(".handling-fee").removeClass("input-text");
+            ps(this).next().find(".handling-fee").removeClass("required-entry");
+            //ps(this).next().next().find(".validation-advice").remove();
+            ps(this).next().hide();
+        }
+    });
+    ps("#city_ship_chk").click(function(){
+        ps("#city_ship").hide();
+        if(ps(this).is(':checked'))
+        {
+          ps("#city_ship").show();  
+        }
+    });
+    ps(".add_button").click(function(){
+        var state = "";
+        var statelabel = "";
+        var city="All";
+        if(ps(".ajaxcitytext" ).val() == '')
+                    {
+                        city = "All";
+                        city = "All";
+                    }
+                    else{
+                        city = ps(".ajaxcitytext" ).val();
+                    city = ps(".ajaxcitytext" ).val();
+                    }
+       if(ps(".ajaxstateselect").is(':visible'))
+       {
+        if(ps(".ajaxstateselect").val() == "")
+                    {
+                        state = "All";
+        statelabel = "All";
+                    }
+                    else{
+                        state = ps(".ajaxstateselect" ).val();
+        statelabel = ps(".ajaxstateselect" ).children("option").filter(":selected").text();
+                        }
+        
+       }
+       else{
+        if(ps(".ajaxstateselecttext" ).val() == "" || ps(".ajaxstateselecttext" ).val() == "Province...")
+                    {
+                        state = "All";
+                        statelabel = "All";
+                    }
+                    else{
+                        state =  ps(".ajaxstateselecttext" ).val();
+        statelabel = ps(".ajaxstateselecttext" ).val();
+                    }
+                    
+                    }
+       var checkboxcountry = ps(".ajaxcountryselect").children("option").filter(":selected").text(); 
+       var checkboxstate = statelabel;
+       var checkboxcity = city;
+       var checkbox = ps(".ajaxcountryselect" ).val() + "_" + state + "_" + city;
+        if(ps(".ajaxcountryselect" ).val() != "")
+        {
+            if (ps(".tbody").length > 0){
+  ps(".tbody").append('<tr class="test"><td style="padding-left: 5px;"><input type="checkbox" value=' + checkbox + ' checked="checked" name="shippingaddress[]" id="shipingaddress_US_5_dfsffsdf"></td> <td style="padding-left: 5px;"><label>' + checkboxcountry  + '</label></td><td style="padding-left: 5px;"><label> ' + checkboxstate  + ' </label></td><td style="padding-left: 5px;"><label>' + checkboxcity +'</label></td></tr>');
+}
+
+    else{
+    ps("#shipping_details_tab").append('<table border="1" class="table" style="width:400px; border-spacing: 0px;"><tbody class="tbody"><tr>  <th style="padding-left: 5px;">Checkbox</th>  <th style="padding-left: 5px;">Country</th>  <th style="padding-left: 5px;">Province</th>  <th style="padding-left: 5px;">City</th></tr></tbody></table>');
+ ps(".tbody").append('<tr class="test"><td style="padding-left: 5px;"><input type="checkbox" value=' + checkbox + ' checked="checked" name="shippingaddress[]" id="shipingaddress_US_5_dfsffsdf"></td> <td style="padding-left: 5px;"><label>' + checkboxcountry  + '</label></td><td style="padding-left: 5px;"><label> ' + checkboxstate  + ' </label></td><td style="padding-left: 5px;"><label>' + checkboxcity +'</label></td></tr>');   
+}
+         ps(".ajaxcountryselect" ).val("");
+        ps(".ajaxstateselecttext" ).val("Province...");
+        ps("#region_id_1" ).hide();
+        ps("#region_1" ).show();
+        ps(".ajaxstateselect" ).val("1");
+        ps(".ajaxcitytext" ).val("");
+        }
+        else{
+            alert("Kindly Select the Country");
+        }
+    });
+     
+});
+    </script>
+</div>

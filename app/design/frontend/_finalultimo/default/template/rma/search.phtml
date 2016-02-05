@@ -1,0 +1,34 @@
+
+                                        <div class="page-title title-buttons">
+    <h1>FIND RMA</h1>
+    </div>
+<div id="messages">
+    </div>
+<form id="awrma-new-form" method="post" action="<?php echo $this->getUrl('multisuppliers/rma/chkrma') ?>">
+    <div class="fieldset">
+        <h2 class="legend">RMA Information</h2>
+        <ul class="form-list">
+            <li class="fields">
+                <div class="field">
+                    <label class="required" for="awrma-orderid"><em>*</em>RMA Id</label>
+                    <div class="input-box">
+                        <input type="text" class="input-text required-entry" id="awrma-orderid" name="rmaid">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="required" for="awrma-email"><em>*</em>E-mail</label>
+                    <div class="input-box">
+                        <input type="text" class="input-text required-entry" id="awrma-email" name="email">
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="buttons-set">
+        <p class="required">* Required Fields</p>
+        <button id="awrma-new-submit" class="button" title="Submit Request" type="submit"><span><span>Submit Request</span></span></button>
+    </div>
+</form>
+<script type="text/javascript">
+    var awrmaNewForm = new VarienForm('awrma-new-form');
+</script>                

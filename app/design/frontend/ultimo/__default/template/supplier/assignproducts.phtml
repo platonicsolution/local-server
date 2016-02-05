@@ -1,0 +1,86 @@
+<div class="content-header">
+    <table cellspacing="0" class="grid-header">
+        <tr>
+            <td><h3><?=$this->__('Check the desire product from below to make it out of stock')?></h3></td>
+            <td class="a-right">
+                <button onclick="editForm.submit()" class="scalable save" type="button"><span>Make out of stock</span></button>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="entry-edit">
+    <form id="edit_form" name="edit_form" method="post" action="<?=$this->getUrl('*/*/assingnsupplier')?>">
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+        <h4 class="icon-head head-edit-form fieldset-legend"><?=$this->__('First Select A Location from Dropdown Below')?></h4>
+        <fieldset id="my-fieldset">
+        <tr><td>
+        <select id="countryid" name="countryid" onchange="getstates(this)" class="required-entry"><option value="">Please First Select the Country.....</option>
+               <?php $this->loadcountry(); ?>
+               </select>
+        
+        </td><td>
+        <select id="regionid" name="regionid" onchange="getcity(this)" class="required-entry"><option value="">Please First Select the State.....</option>
+               </select>
+        </td><td>
+        <select id="city" name="city" onchange="getproducts(this)" class="required-entry"><option value="">Please First Select the City.....</option>
+               </select>
+        </td></tr>
+            
+            <div id="productGrid">
+           
+</div>
+            <input  id="baseurl" type="hidden" value="<?php echo Mage::getBaseUrl(); ?>"/>
+        </fieldset>
+    </form>
+</div>
+<script type="text/javascript">
+    var editForm = new varienForm('edit_form');
+</script>
+<script type="text/javascript">
+
+function getstates(selectElement){
+                var reloadurl =  $('baseurl').value + "multisuppliersmarketplace/index/states?countryid=" + selectElement.value;
+                new Ajax.Request(reloadurl, {
+                    method: 'get',
+                    onLoading: function (stateform) {
+                        $("regionid").update('<option>Searching...</option>');
+                        $("productGrid").update('');
+                    },
+                    onComplete: function(stateform) {
+                        $("regionid").update(stateform.responseText);
+                    }
+
+                });
+
+            }
+            
+function getcity(selectElement){
+                var reloadurl =  $('baseurl').value + "multisuppliersmarketplace/index/cities?regionid=" + selectElement.value;
+                new Ajax.Request(reloadurl, {
+                    method: 'get',
+                    onLoading: function (stateform) {
+                        $("city").update('<option>Searching...</option>');
+                        $("productGrid").update('');
+                    },
+                    onComplete: function(stateform) {
+                        $("city").update(stateform.responseText);
+                    }
+
+                });
+
+            }
+function getproducts(selectElement){
+                var reloadurl =  $('baseurl').value + "multisuppliersmarketplace/index/products?city=" + selectElement.value;
+                new Ajax.Request(reloadurl, {
+                    method: 'get',
+                    onLoading: function (stateform) {
+                        $("productGrid").update('Searching...');
+                    },
+                    onComplete: function(stateform) {
+                        $("productGrid").update(stateform.responseText);
+                    }
+
+                });
+
+            }
+        </script>

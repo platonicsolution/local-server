@@ -1,0 +1,27 @@
+<?php
+// app/design/frontend/default/default/template/recentproducts/recentproducts.phtml
+$products = $this->getRecentProducts();
+/**
+ * echo "<pre>";
+ * print_r($products);
+ * echo "</pre>";
+ */
+// zend_debug::dump($products);
+?>
+  
+<div id="product_list">
+  <h1>3 most expensive products </h1>
+  <?php //if (is_array($products) && count($products)) { ?>
+    <?php foreach($products as $product) { ?>
+      <div style="float: left; margin-right: 10px;">
+        <a href="<?php echo $product->getProductUrl(); ?>"><?php echo $product->getName();//$product['name'] ?></a><br />
+        
+        <a href="<?php echo $product['url'] ?>">
+            <img src="<?php echo $this->helper('catalog/image')->init($product, 'small_image')->keepFrame(false)->resize(300); ?>"/>
+        </a>
+        Price : <?php echo $product->getFinalPrice();//$product['price'] ?><br />
+        <button type="button" title="<?php echo $this->__('Add to Cart') ?>" class="button btn-cart" onclick="setLocation('<?php  echo Mage::helper('checkout/cart')->getAddUrl($product); ?>')"><span><span><?php echo $this->__('Add to Basket') ?></span></span></button>
+      </div>
+    <?php } ?>
+  <?php //} ?>
+</div>

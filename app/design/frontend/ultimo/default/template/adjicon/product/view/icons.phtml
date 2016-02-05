@@ -1,0 +1,18 @@
+<?php
+/**
+ * Visualize Your Attributes - Color Swatch
+ *
+ * @category:    AdjustWare
+ * @package:     AdjustWare_Icon
+ * @version      3.1.10
+ * @license:     W9f9ElvXIvbmpYLtgppvzIZxNydXRy4MwFD0F07481
+ * @copyright:   Copyright (c) 2014 AITOC, Inc. (http://www.aitoc.com)
+ */
+$_product = $this->getProduct();
+Mage::helper('adjicon')->init(array($_product));
+$icons = Mage::helper('adjicon')->display($_product);
+?>
+<script type="text/javascript">
+    var adjIcons = <?php echo Mage::helper('core')->jsonEncode($icons) ?>;
+    $$('.product-name').first().insert({after: adjIcons});
+</script>

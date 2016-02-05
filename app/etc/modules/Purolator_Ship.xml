@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Purolator_Ship>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Purolator_Ship>
+    </modules>
+</config> 

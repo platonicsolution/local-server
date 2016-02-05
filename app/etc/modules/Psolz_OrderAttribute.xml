@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Psolz_OrderAttribute>
+            <active>true</active>
+            <codePool>false</codePool>
+        </Psolz_OrderAttribute>
+    </modules>
+</config>

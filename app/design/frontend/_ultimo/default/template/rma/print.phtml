@@ -1,0 +1,102 @@
+<body class="page-print awrma-customer-rma-printform">
+
+<?php $rmaid =  $this->getRequest()->getParam('rmaid');
+$lastrma = Mage::getModel('multisuppliers/rma')->load($rmaid);
+?>
+<div>
+    <div class="print-head">
+        <img alt="" class="logo" src="<?php echo $this->getSkinUrl('images/logo.png') ?>"/>
+            </div>
+            <style type="text/css">
+        .awrma-left-column {
+            width: 50%;
+            float: left;
+        }
+        .awrma-right-column {
+            width: 50%;
+            float: right;
+        }
+        .awrma-line {
+            border-bottom: dotted 1px #000;
+        }
+        .awrma-table td {
+            padding-right: 7px;
+        }
+    </style>
+    <?php $orderss = Mage::getModel("sales/order")->loadByIncrementId($lastrma->getData('order_increment_id'));
+    ?>
+    <h1>RMA #<?php echo $lastrma->getData('rma_increment_id') ?></h1>
+    <p><?php echo $lastrma->getData('created_at') ?></p>
+    <p class="awrma-line"></p>
+    <div class="awrma-left-column">
+    <h2>Return Address</h2>
+       <?php echo $orderss->getShippingAddress()->format('html'); ?></div>
+    <div class="awrma-right-column">
+        <h2>Details</h2>
+        <table border="0" class="awrma-table">
+            <tbody><tr valign="top">
+                <td>Order ID:</td>
+                <td>#<?php echo $lastrma->getData('order_increment_id') ?></td>
+            </tr>
+                            <tr valign="top">
+                    <td>Request Type:</td>
+                    <td><?php echo $this->gettype($lastrma->getData('requesttype')) ?></td>
+                </tr>
+                        <tr valign="top">
+                <td>Package Opened:</td>
+                <td><?php echo $this->getpackagetype($lastrma->getData('packageopened')) ?></td>
+            </tr>
+            <!--<tr valign="top">
+                <td>Approvement Code:</td>
+                <td></td>
+            </tr>-->
+                            <tr valign="top">
+                    <td>Reason:</td>
+                    <td>  <?php echo $this->getreason($lastrma->getData('reason_id')) ?></td>
+                </tr>
+                                   <!-- <tr valign="top">
+                        <td>Reason Details:</td>
+                        <td>keyboard problems </td>
+                    </tr>-->
+                                    </tbody></table>
+    </div>
+    <div style="clear: both"></div>
+        <h2>Items RMA Requested for</h2>
+        <table class="data-table" id="awrma-requested-items">
+            <colgroup><col>
+        <col width="1">
+        <col width="1">
+        </colgroup><thead>
+                <tr class="first last">
+                    <th>Product Name</th>
+                    <th>SKU</th>
+                    <th>Qty</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach(json_decode($lastrma->getData('rmaitems')) as $items){
+                $item = Mage::getModel('sales/order_item')->load($items->item);?> 
+            <tr class="border first last odd">
+    <td><h3 class="product-name"><?php echo $item->getName(); ?></h3>
+                                        </td>
+    <td><?php echo $item->getSku(); ?></td>
+    <td class="a-right last">
+        <span class="nobr">
+                           <?php echo $items->qty; ?>                    </span>
+
+                        <br>
+                    </td>
+    </tr>
+            <?php }?>
+                                                                                </tbody>
+        </table>
+<script type="text/javascript">
+    decorateTable('awrma-requested-items');
+    window.print();
+</script>    <div class="buttons-set">
+        <button onclick="window.close();" class="button" title="Close Window" type="button"><span><span>Close Window</span></span></button>
+    </div>
+    </div>
+
+
+</body>

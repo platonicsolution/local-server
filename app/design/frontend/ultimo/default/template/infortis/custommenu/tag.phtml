@@ -1,0 +1,24 @@
+
+
+<script type='text/javascript'>
+var ps = jQuery.noConflict();
+ps(document).ready(function() {
+    ps.ajax({
+
+  type: "GET",
+
+  url: ps("#baseurl").val() + "multisuppliersmarketplace/brand/getcategorytagss?catid="+ps("#maincategorytag<?php echo  $this->getCategoryFor(); ?>").val() ,
+})
+
+  .done(function( msg ) {        
+ps("#ajax_id_tags<?php echo  $this->getCategoryFor(); ?>").text(' ');
+ps("#ajax_id_tags<?php echo  $this->getCategoryFor(); ?>").append(msg);
+  });
+  });    
+ </script>
+<input id="baseurl" type="hidden" value="<?php echo Mage::getBaseUrl(); ?>"/>
+<input id="maincategorytag<?php echo  $this->getCategoryFor(); ?>" type="hidden" value="<?php echo  $this->getCategoryFor(); ?>" />  
+<?php
+ ?>
+<div id="ajax_id_tags<?php echo  $this->getCategoryFor(); ?>">
+</div>

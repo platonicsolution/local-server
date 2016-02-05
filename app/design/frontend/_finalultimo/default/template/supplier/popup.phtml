@@ -1,0 +1,554 @@
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<style type="text/css">
+
+#overlay {
+
+position: fixed;
+
+top: 0;
+
+left: 0;
+
+width: 100%;
+
+height: 100%;
+
+background-color: #000;
+
+filter:alpha(opacity=70);
+
+-moz-opacity:0.7;
+
+-khtml-opacity: 0.7;
+
+opacity: 0.7;
+
+z-index: 100;
+
+display: none;
+
+}
+
+
+
+.popup{
+
+margin: 0 auto;
+
+display: block;
+
+position: fixed;
+
+z-index: 999999999;
+
+top: 50%;
+
+left: 20%;
+
+background: white;
+
+}
+
+.psol_content{
+
+position: fixed;
+
+top: 0;
+
+width: 62%;
+
+min-height: 150px;
+
+margin: 100px auto;
+
+background: #f3f3f3;
+
+z-index: 103;
+
+padding: 10px 25px;
+
+border-radius: 7px;
+
+box-shadow: 0 2px 5px #000;
+
+}
+
+.psol_content p{
+
+clear: both;
+
+color: #555555;
+
+text-align: justify;
+
+}
+
+.psol_content p a{
+
+color: #d91900;
+
+font-weight: bold;
+
+}
+
+.psol_content .x{
+
+float: right;
+
+height: 35px;
+
+left: 22px;
+
+position: relative;
+
+top: -25px;
+
+width: 34px;
+
+}
+
+.psol_content .x:hover{
+
+cursor: pointer;
+
+}
+
+</style>
+
+
+
+
+
+
+<?php 
+$piecesurl = explode("/" , $_SERVER['REQUEST_URI']);
+if(in_array("vendorregisteration",$piecesurl))
+{}else{?>
+<!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.js"></script>-->
+<?php }
+?>
+
+
+<?php  
+
+if(Mage::getSingleton('core/session', array('name' => 'frontend'))->getPsolflag() == '')
+
+{?>
+
+<script type='text/javascript'>
+
+var ps = jQuery.noConflict();
+
+ps(document).ready(function() {
+
+    var overlay = ps('<div id="overlay"></div>');
+
+    overlay.show();
+
+overlay.appendTo(document.body);
+
+ps(".popup").show();
+
+ps("#emsg").hide();
+
+ps(function(){
+
+var overlay = ps('<div id="overlay"></div>');
+
+ps('#test').click(function(){
+
+    ps('#emsg').show();
+
+    overlay.show();
+
+overlay.appendTo(document.body);
+
+ps(".popup").show();
+
+})
+
+ps('.close').click(function(){
+
+    var state = "";
+
+    if(ps(".ajaxstateselectpopup").is(':visible'))
+
+       {
+       
+
+        state = ps(".ajaxstateselectpopup").children("option").filter(":selected").text();
+       }
+
+       else{
+
+        state = ps(".ajaxstateselectpopuptext").val();
+       }
+
+    if(ps("#country_id_ajax").val() != "" && state != "" && ps("#city_ship_ajax").val() != "")
+
+    {
+
+        ps.ajax({
+
+  type: "GET",
+
+  url: ps("#baseurl").val() + "multisuppliersmarketplace/index/test",
+
+  data: { country:ps("#country_id_ajax").val() , region:  state ,city: ps("#city_ship_ajax").val(),flag:"true" }
+
+})
+
+  .done(function( msg ) {
+
+    ps("#overlay").hide();
+        location.reload();
+ps("#overlay").remove();
+
+  
+
+
+
+  });
+
+   ps('.popup').hide();
+
+    }
+
+    else{
+
+        alert('Please verify Location');
+
+    } 
+
+    
+
+
+
+return false;
+
+});
+
+});
+
+});
+
+</script>
+
+<?php }else{
+
+    
+
+    ?>
+
+    <script type='text/javascript'>
+
+var ps = jQuery.noConflict();
+
+ps(document).ready(function() {
+
+    ps(".popup").hide();
+
+    ps('#emsg').hide();
+
+ps(function(){
+
+ps('#test').click(function(){
+
+    
+
+    var overlay = ps('<div id="overlay"></div>');
+
+    overlay.show();
+
+overlay.appendTo(document.body);
+
+ps(".popup").show();
+
+ps('#emsg').show();
+
+});
+
+ps('.close').click(function(){
+
+    var state = "";
+
+    if(ps(".ajaxstateselectpopup").is(':visible'))
+
+       {
+
+        state = ps(".ajaxstateselectpopup").children("option").filter(":selected").text()
+
+       }
+
+       else{
+
+        state = ps(".ajaxstateselectpopuptext").val();
+
+       }
+
+    if(ps("#country_id_ajax").val() != "" && state != "" && ps("#city_ship_ajax").val() != "")
+
+    {
+
+        ps.ajax({
+
+  type: "GET",
+
+  url: ps("#baseurl").val() + "multisuppliersmarketplace/index/test",
+
+  data: { country:ps("#country_id_ajax").val() , region:  state ,city: ps("#city_ship_ajax").val(),flag:"true" }
+
+})
+
+  .done(function( msg ) {
+if(msg == "0")
+{
+    alert("No product in your cart matches with new location");
+    location.reload();
+}
+    ps("#overlay").hide();
+
+ps("#overlay").remove();
+
+  
+
+
+
+  });
+
+   ps('.popup').hide();
+
+    }
+
+    else{
+
+        alert('Please verify Location');
+
+    } 
+
+    
+
+
+
+return false;
+
+});
+
+});
+
+});
+
+</script>
+
+<?php  }
+
+
+
+?>
+
+</head>
+
+<body>
+
+<a style="display: none;" id="test"></a>
+
+<div style="display: none;" class="popup">
+
+<div class='psol_content'>
+
+<div style="position: absolute; top: 0;left: 0;background: black;width: 100%;height: 100%;display: none;opacity: 0.5;border-radius:7px;" id="over"></div>
+
+<strong id="emsg">Your Shipping/Billing Address mismatches with your current location.</strong>
+
+<p>
+
+Below is your Current location.
+
+<?php
+
+       function ip_details($ip){
+
+        $json = file_get_contents("http://ipinfo.io/{$ip}");
+
+        $jsonDecode = json_decode($json);
+
+        return $jsonDecode;
+
+       }
+
+       $remoteAddr = Mage::helper('core/http')->getRemoteAddr(true);
+
+       $info = ip_details(long2ip($remoteAddr));
+
+       if(Mage::getSingleton('core/session', array('name' => 'frontend'))->getCountry() == '')
+
+       {
+
+        $ipcountry = $info->country;
+
+        $ipregion = $info->region;
+
+        $ipcity = $info->city;
+
+        
+
+       }else{
+
+        $ipcountry = Mage::getSingleton('core/session', array('name' => 'frontend'))->getCountry();
+
+        $ipregion = Mage::getSingleton('core/session', array('name' => 'frontend'))->getRegion();
+
+        $ipcity = Mage::getSingleton('core/session', array('name' => 'frontend'))->getCity();
+
+       }
+
+       
+
+       
+
+       ?>
+
+<ul class="form-list">
+
+            <li class="fields">
+
+                    <div class="field">
+
+                        <label > <?php echo $this->__('Country') ?></label>
+
+                        <div class="input-box ajaxcountry">
+
+<?php if (count($this->loadcountries()) > 0): ?>
+
+	<select id="country_id_ajax" onchange="getstate(this)" name="country">
+
+		<option value="">-- Please Select --</option>
+
+		<?php foreach($this->loadcountries() as $_country): ?>
+
+			<option <?php if($_country['value'] == $ipcountry){echo('selected=selected');} ?> value="<?php echo $_country['value'] ?>">
+
+				<?php echo $_country['label'] ?>
+
+			</option>
+
+		<?php endforeach; ?>
+
+	</select>
+
+    <script type="text/javascript">
+
+            function getstate(selectElement){
+
+                $('region_id_ajax').show();
+
+                $('regiontext').hide();
+
+                var reloadurl =  $('baseurl').value + "multisuppliersmarketplace/index/state/country/" + selectElement.value;
+
+                new Ajax.Request(reloadurl, {
+
+                    method: 'get',
+
+                    onLoading: function (stateform) {
+
+                        $('region_id_ajax').update('Searching...');
+
+                        $('over').show();
+
+                    },
+
+                    onComplete: function(stateform) {
+
+                        $('over').hide();
+                        $('region_id_ajax').show();
+
+                        $('region_id_ajax').update(stateform.responseText);
+
+                        if(stateform.responseText == 'none')
+
+                        {
+
+                        $('region_id_ajax').hide();
+
+                        $('regiontext').show();
+
+                        }
+
+                    }
+
+                });
+
+            }
+
+        </script>
+
+<?php endif; ?>
+
+
+
+                        </div>
+
+                    </div>
+
+                    <div class="field">
+
+                        <label for="region_id_ajax"><?php echo $this->__('State/Province') ?></label>
+
+                        <div class="input-box">
+
+                            <select id="region_id_ajax" title="<?php echo $this->__('State/Province') ?>" class="ajaxstateselectpopup">
+
+                                <option value=""><?php echo $ipregion ?></option>
+
+                            </select>
+
+                            <input type="text" id="regiontext"  value="<?php echo $this->escapeHtml($this->getRegion()) ?>" title="<?php echo $this->__('State/Province') ?>" class="ajaxstateselectpopuptext input-text" style="display:none;" />
+
+                        </div>
+
+                    </div>
+
+                    <div class="field">
+
+                        <label for="city_ship_chk"><?php echo $this->__('Add City') ?></label>
+
+                        <div class="input-box">
+
+                            <input type="text" title="<?php echo $this->__('City_ship') ?>" class=" ajaxcitytext input-text " id="city_ship_ajax" value="<?php echo $ipcity;?>"/>
+
+                        </div>
+
+                    </div>
+
+                    <input  id="baseurl" type="hidden" value="<?php echo Mage::getBaseUrl(); ?>"/>
+
+                    </li>
+
+                    </ul>
+
+
+
+<br/>
+
+<br/>
+
+
+
+<a href='' class='close'>Close</a>
+
+</p>
+
+</div>
+
+</div>         
+
+</body>
+
+</html>
+

@@ -1,0 +1,160 @@
+
+                                        <div id="messages">
+    </div>
+<script type="text/javascript">
+    var awrmaConfirmText = 'Having clicked \"Yes\", you won\'t be able to cancel RMA or make any changes.\nPlease ensure that:\n1. You have included the RMA Label inside the package\n2. You have sent the package to the RMA department\n                ';
+</script>
+
+<?php $RMA = Mage::getModel( 'multisuppliers/rma' )
+
+					->getCollection()
+
+					->addFieldToFilter( 'rma_id',$this->getRequest()->getParam('rmaid'))->getFirstItem()
+
+					->getData();  ?>
+<div class="awrma-account">
+                    <div class="page-title title-buttons">
+            <h1>RMA #<?php echo $RMA['rma_increment_id'] ?>&nbsp;&ndash;&nbsp;<?php echo $this->getstatus($RMA['status']) ?></h1>
+<?php if($RMA['status'] == Mage::getStoreConfig( 'rma/rma/default_status' ) ){
+    
+    ?>
+    <a class="link-awrma-cancel" onclick="return confirm('Are you sure you would like to cancel this RMA?')" href="<?php echo $this->getCancelActionUrl($this->getRequest()->getParam('rmaid')) ?>">Cancel</a>
+<span class="separator">|</span>
+<?php } ?>
+
+<?php if($RMA['status'] == Mage::getStoreConfig( 'rma/rma/approved_status' ) ){
+    
+    ?>
+    <a class="link-awrma-printlabel" target="_blank" href="<?php echo $this->getUrl('multisuppliers/rma/printrma/rmaid/'.$this->getRequest()->getParam('rmaid')) ?>">Print Label</a>
+<?php } ?>
+
+                                    </div>
+        <div class="fieldset">
+            <h2 class="legend">Request Information</h2>
+            <ul class="form-list">
+                <li class="fields">
+                    <div class="field">
+                        <strong>RMA ID:</strong> <?php echo $RMA['rma_increment_id'] ?>                    </div>
+                    <div class="field">
+                        <strong>Initiated at:</strong> <?php echo $RMA['created_at'] ?>                    </div>
+                </li>
+                <li class="fields">
+                    <div class="field">
+                        <strong>Order ID:</strong> <a href="<?php echo $this->getViewUrl($RMA['order_increment_id']); ?>"><?php echo $RMA['order_increment_id'] ?></a>                    </div>
+                                            <div class="field">
+                            <strong>Request Type:</strong> <?php echo $this->gettype($RMA['requesttype']) ?>                        </div>
+                                    </li>
+                <li class="fields">
+                    <div class="field">
+                        <strong>Status:</strong> <?php echo $this->getstatus($RMA['status']) ?>                    </div>
+                                            <div class="field">
+                            <strong>Package Opened:</strong> <?php echo $this->getpackagetype($RMA['packageopened']) ?>                       </div>
+                                    </li>
+                                    <li class="fields">
+                        <div class="field">
+                            <strong>Reason:</strong>
+                                                            <?php echo $this->getreason($RMA['reason_id']) ?>                                                   </div>
+                                            </li>
+                            </ul>
+        </div>
+        <h4>Items RMA Requested for</h4>
+        <table class="data-table" id="awrma-requested-items">
+            <colgroup><col>
+            <col width="100">
+            <col width="1">
+            </colgroup><thead>
+                <tr class="first last">
+                    <th>Product Name</th>
+                    <th>SKU</th>
+                    <th>Qty</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach(json_decode($RMA['rmaitems']) as $items){
+                $item = Mage::getModel('sales/order_item')->load($items->item);?> 
+            <tr class="border first last odd">
+    <td><h3 class="product-name"><?php echo $item->getName(); ?></h3>
+                                        </td>
+    <td><?php echo $item->getSku(); ?></td>
+    <td class="a-right last">
+        <span class="nobr">
+                           <?php echo $items->qty; ?>                    </span>
+
+                        <br>
+                    </td>
+    </tr>
+            <?php }?>
+                                                                                </tbody>
+        </table>
+                    <div class="fieldset">
+                <h2 class="legend">Leave Comment</h2>
+                                                        <form enctype="multipart/form-data" action="<?php echo $this->getCommentActionUrl() ?>" id="awrma-comment-form" method="post">
+                        <input type="hidden" value="2097152" name="MAX_FILE_SIZE">
+                        <input type="hidden" value="1AUJL6Xx4ScwPC5a" name="form_key">
+                        <input type="hidden" value="<?php echo $this->getRequest()->getParam('rmaid'); ?>" name="rmaid" />
+                        <ul class="form-list">
+                            <li class="wide">
+                                <label class="required" for="awrma-comment-text"><em>*</em>Comment Text</label>
+                                <div class="input-box">
+                                    <textarea class="required-entry" id="awrma-comment-text" name="comment"></textarea>
+                                    
+                                </div>
+                            </li>
+                            <li class="fields">
+                                <div class="field">
+                                    <label for="awrma-file-upload">Attachment</label>
+                                    <div class="input-box">
+                                        <input type="file" name="attachedfile" id="awrma-file-upload">
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="buttons-set">
+                            <p class="required">* Required Fields</p>
+                            <button id="awrma-comment-submit" class="button" title="Submit Comment" type="submit"><span><span>Submit Comment</span></span></button>
+                        </div>
+                    </form>
+                    <script type="text/javascript">
+                        var commentForm = new VarienForm('awrma-comment-form', true);
+                    </script>
+                                                        <ul class="awrma-comments-list">
+                                                        
+                    <?php foreach(json_decode($RMA['comments']) as $comment){
+                       ?> <li>
+                                <strong>
+                                    <?php echo $comment->date; ?>                                   <span class="separator">|</span>
+                                                                            <?php echo $comment->author; ?>                                                                 </strong>
+                                <div>
+                                <?php echo $comment->comment; ?>                                </div>
+                                <div>
+                                <?php if($comment->file != "" ){
+                                    ?>
+                                    <a href="<?php echo $comment->file; ?>" target="_blank"> Attached File </a>                                
+                                    <?php
+                                } ?>
+                                </div>
+                                            </li>
+                        
+                    <?php } ?>
+                                        
+                                        </ul>
+                        </div>
+            <script type="text/javascript">
+            decorateTable('awrma-requested-items');
+        </script>
+        <style>
+        ul.awrma-comments-list li {
+    border-top-color: #333;
+    border-top-style: dotted;
+    border-top-width: 1px;
+    padding-bottom: 10px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 10px;
+}
+        </style>
+</div>
+    <div class="buttons-set">
+    <p class="back-link"><a href="<?php echo $this->getUrl('customer/account') ?>"><small>&laquo; </small><?php echo $this->__('Back') ?></a></p>
+</div>
+                

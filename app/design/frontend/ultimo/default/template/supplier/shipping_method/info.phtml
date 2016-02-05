@@ -1,0 +1,200 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+$baseCurrencyCode = Mage::app()->getStore()->getBaseCurrencyCode();
+$currentCurrencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
+
+$quote = Mage::getSingleton('checkout/session')->getQuote();
+        $cartItems = $quote->getAllVisibleItems();
+        foreach ($cartItems as $item)
+        {
+            $my_product_array[] = $item->getProductId();
+        }
+$users = Mage::getModel( 'multisuppliers/productscollect' )
+					->getCollection()
+					->addFieldToSelect( 'user_id' )
+					 ->addFieldToFilter('product_id', array(
+					'in' => array( $my_product_array )))
+					->load();
+
+foreach($users as $us)
+{
+    $my_user_array[] = $us->getData('user_id');
+}
+$collection = Mage::getModel('multisuppliers/multisuppliers')->getCollection()->addFieldToSelect('userid')->addFieldToFilter('userid', array(
+					'in' => array( $my_user_array )));
+ 
+ ?><div id="checkout-review-table-wrapper">
+    
+ <?php $index = ""; $i =0;
+ foreach($collection as $col)
+{
+    $index++;
+echo( "Order # " . $index);
+    ?>
+<table id="checkout-review-table" class="data-table">
+                <colgroup><col>
+        <col width="1">
+        <col width="1">
+        <col width="1">
+                </colgroup><thead>
+            <tr class="first last">
+                <th rowspan="1">Product Name</th>
+                <th class="a-center" colspan="1">Price</th>
+                <th class="a-center" rowspan="1">Qty</th>
+                <th class="a-center" colspan="1">Subtotal</th>
+            </tr>
+                    </thead>
+
+<?php
+$my_product_array=array(); 
+$products = Mage::getModel( 'multisuppliers/productscollect' )
+					->getCollection()
+					->addFieldToSelect( 'product_id' )
+					 ->addFieldToFilter('user_id',$col->getData('userid'))
+					->load(); 
+foreach($products as $pr)
+{
+    $my_product_array[] =$pr->getData('product_id');
+}
+$quoteitem = Mage::getSingleton('checkout/session')->getQuote()->getAllVisibleItems();
+$subtotal=array();
+$qtytotal = array();
+$taxtotal = array();
+foreach($quoteitem as $qt)
+{
+    //Mage::log($qt,null,'quote.log');exit;
+  
+    ?>
+
+    <tbody><?php
+    if(in_array($qt->getProductId(),$my_product_array)){
+        ?>
+                    <tr class="first last odd">
+    <td><h3 class="product-name"><?php echo($qt->getName()) ?></h3>
+                    </td>
+        <td class="a-right">
+                    <span class="cart-price">
+        
+                            <span class="price">
+<?php echo Mage::app()->getLocale()->currency($currentCurrencyCode)->getSymbol().sprintf("%.2f",Mage::helper('directory')->currencyConvert($qt->getPrice(), $baseCurrencyCode, $currentCurrencyCode)); ?>
+<?php  //echo($qt->getPrice()) ;?></span>            
+        </span>
+
+
+            </td>
+            <td class="a-center"><?php  echo($qt->getQty()) ;?></td>
+    <!-- sub total starts here -->
+        <td class="a-right last">
+                    <span class="cart-price">
+        
+                            <span class="price">
+<?php echo Mage::app()->getLocale()->currency($currentCurrencyCode)->getSymbol().sprintf("%.2f",Mage::helper('directory')->currencyConvert($qt->getRowTotalInclTax(), $baseCurrencyCode, $currentCurrencyCode)); ?>
+    
+<?php  //echo number_format(floatval($qt->getRowTotalInclTax()),2) ;?></span>            
+        </span>
+            </td>
+        </tr>
+                </tbody>
+    
+    <?php 
+        $qtytotal[] = $qt->getQty();
+        $subtotal[] =$qt->getRowTotalInclTax()-($qt->getRowTotalInclTax()-$qt->getPrice())*$qt->getQty();
+        $taxtotal[]=$qt->getRowTotalInclTax()-$qt->getPrice();
+    }
+    echo $i; $i++;
+}
+?>
+<tfoot>
+        <tr class="first">
+    <td colspan="3" class="a-right" style="">
+        Subtotal    </td>
+    <td class="a-right last" style="">
+        <span class="price">
+        <?php echo Mage::app()->getLocale()->currency($currentCurrencyCode)->getSymbol().sprintf("%.2f",Mage::helper('directory')->currencyConvert(array_sum($subtotal), $baseCurrencyCode, $currentCurrencyCode)); ?>
+
+        
+        <?php //echo number_format(floatval(array_sum($subtotal)),2); ?></span>    </td>
+</tr>
+<tr>
+   <td colspan="3" class="a-right" style="">
+        Tax    </td>
+    <td class="a-right last" style="">
+        <span class="price">
+        <?php echo Mage::app()->getLocale()->currency($currentCurrencyCode)->getSymbol().sprintf("%.2f",Mage::helper('directory')->currencyConvert(array_sum($taxtotal), $baseCurrencyCode, $currentCurrencyCode)); ?>
+
+        
+        <?php //echo number_format(floatval(array_sum($subtotal)),2); ?></span>    </td> 
+</tr>
+<tr>
+    <td colspan="3" class="a-right" style="">
+        Shipping &amp; Handling (<?php
+        $shippingdetails = explode("/" , $_SESSION['shippingmethod']['shipping_method'][$col->getData('userid')]);
+        $shipmethod = $shippingdetails[0];
+        $shipdescription = $shippingdetails[1];
+        $shipprice = $shippingdetails[3];
+        $totalshipment = $shippingdetails[4];
+         echo $shipdescription ?>)    </td>
+    <td class="a-right last" style="">
+        <span class="price">
+        <?php echo Mage::app()->getLocale()->currency($currentCurrencyCode)->getSymbol().sprintf("%.2f",Mage::helper('directory')->currencyConvert($totalshipment, $baseCurrencyCode, $currentCurrencyCode)); ?>
+
+        <?php //echo $totalshipment;//((int)array_sum($qtytotal) * (int)$shipprice) ?></span>    </td>
+</tr>
+    <tr class="last">
+    <td colspan="3" class="a-right" style="">
+        <strong>Grand Total</strong>
+    </td>
+    <td class="a-right last" style="">
+        <strong><span class="price">
+        <?php
+        $grandTotal = array_sum($subtotal)+ $totalshipment+array_sum($taxtotal);
+         echo Mage::app()->getLocale()->currency($currentCurrencyCode)->getSymbol().sprintf("%.2f",Mage::helper('directory')->currencyConvert($grandTotal, $baseCurrencyCode, $currentCurrencyCode)); ?>
+
+        <?php    //echo number_format(floatval((array_sum($subtotal))+ $totalshipment) ,2 )?></span></strong>
+    </td>
+</tr>
+    </tfoot>
+
+
+</table>
+<?php 
+}
+?></div>
+
+<div class="buttons-set" id="review-buttons-container">
+        <p class="f-left"><?php echo $this->__('Forgot an Item?') ?> <a href="<?php echo $this->getUrl('checkout/cart') ?>"><?php echo $this->__('Edit Your Cart') ?></a></p>
+        <?php echo $this->getChildHtml('button') ?>
+        <span class="please-wait" id="review-please-wait" style="display:none;">
+            <img src="<?php echo $this->getSkinUrl('images/opc-ajax-loader.gif') ?>" alt="<?php echo $this->__('Submitting order information...') ?>" title="<?php echo $this->__('Submitting order information...') ?>" class="v-middle" /> <?php echo $this->__('Submitting order information...') ?>
+        </span>
+    </div>
+<script type="text/javascript">
+    //<![CDATA[
+        review = new Review('<?php echo $this->getUrl('checkout/onepage/saveOrder', array('form_key' => Mage::getSingleton('core/session')->getFormKey())) ?>', '<?php echo $this->getUrl('checkout/onepage/success') ?>', $('checkout-agreements'));
+    //]]>
+    </script>

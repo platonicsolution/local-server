@@ -1,0 +1,727 @@
+<?php 
+if(Mage::getStoreConfig('multisuppliers/multisuppliers/location_enable') == 0):
+ if(Mage::getModel('core/cookie')->get('Country') == ''):
+       $remoteAddr = Mage::helper('core/http')->getRemoteAddr(true);
+        $ip = long2ip($remoteAddr);
+       $info = json_decode(file_get_contents("http://ipinfo.io/{$ip}"));
+
+Mage::getModel('core/cookie')->set('testcookie', 'testvalue');      
+
+    if (Mage::getModel('core/cookie')->get('testcookie') != "") 
+
+       {
+        if(Mage::getModel('core/cookie')->get('Country') == '')
+
+       {
+
+        $ipcountry = $info->country;
+        if($info->region != ""):
+        $ipregion = $info->region;
+        else:
+        $ipregion = "All";        
+        endif;        
+        $ipcity = "All";
+
+        
+
+       }else{
+
+        $ipcountry = Mage::getModel('core/cookie')->get('Country');
+
+        $ipregion = Mage::getModel('core/cookie')->get('Region');
+
+        $ipcity = "All";
+
+       }
+       }else{
+        if(Mage::getSingleton('core/session', array('name' => 'frontend'))->getCountry() == '')
+
+       {
+
+        $ipcountry = $info->country;
+
+       if($info->region != ""):
+        $ipregion = $info->region;
+        else:
+        $ipregion = "All";
+        endif;
+
+        $ipcity = "All";
+
+        
+
+       }else{
+
+        $ipcountry = Mage::getSingleton('core/session', array('name' => 'frontend'))->getCountry();
+
+        $ipregion = Mage::getSingleton('core/session', array('name' => 'frontend'))->getRegion();
+
+        $ipcity = "All";
+
+       }
+       }
+
+
+include_once(Mage::getBaseDir().'/var/geoip/geoip.inc');
+        // Open Geo IP binary data file
+        $geoIp = geoip_open(Mage::getBaseDir().'/var/geoip/GeoIP.dat',GEOIP_STANDARD);
+        
+        $currencyCode = geoip_currency_code_by_country_code($geoIp,$this->getRequest()->getParam('country'));
+        
+        if($currencyCode !="")
+        Mage::app()->getStore()->setCurrentCurrencyCode($currencyCode);
+       
+       Mage::getModel('core/cookie')->set('testcookie', 'testvalue');//setcookie('testcookie', "testvalue");       
+
+        if($ipcountry == "")
+        {
+           $ipcountry = "CA"; 
+        }
+
+    if (Mage::getModel('core/cookie')->get('testcookie') != "") {
+        Mage::getModel('core/cookie')->set('Country', $ipcountry);
+        Mage::getModel('core/cookie')->set('Region', $ipregion);
+        Mage::getModel('core/cookie')->set('City', $ipcity);
+        Mage::getModel('core/cookie')->set('Psolflag', "true");
+    } else {
+        Mage::getSingleton('core/session')->setCountry($ipcountry);
+        Mage::getSingleton('core/session')->setRegion($ipregion);
+         Mage::getSingleton('core/session')->setCity($ipcity);
+         Mage::getSingleton('core/session')->setPsolflag("true");
+    }
+    ?>
+<script>
+location.reload();
+</script>
+<?php    
+    endif;
+    
+    endif;            
+  ?>
+
+
+
+
+
+
+
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<?php if($this->getRequest()->getParam('chkcart') == 'ttrue'){
+  ?>
+  <script type='text/javascript'>
+var ps = jQuery.noConflict();
+ps(document).ready(function() { 
+    ps.ajax({
+
+  type: "GET",
+
+  url: ps("#baseurl").val() + "multisuppliersmarketplace/index/chkcart",
+})
+
+  .done(function( msg ) {
+
+if(msg != "noitem")
+{
+    if(msg != "allok"){
+        
+     ps("#cart-products").append(msg);
+     
+     var overlay = ps('<div id="overlay"></div>');
+
+    overlay.show();
+
+overlay.appendTo(document.body);
+ps(".popup").show();
+ps("#cart-products").show();
+//ps(".psol_content").show();
+}
+}
+  });
+  
+  ps("#changelocatio").live("click",function(){
+     ps.ajax({
+
+  type: "GET",
+
+  url: ps("#baseurl").val() + "multisuppliersmarketplace/index/changelocation",
+})
+.done(function( msg ) {
+    ps(".popup").hide();
+ps("#overlay").hide();
+
+        location.reload();
+ps("#overlay").remove();
+  });
+  });
+  
+  ps("#cancel").live("click",function(){
+     ps.ajax({
+
+  type: "GET",
+
+  url: ps("#baseurl").val() + "multisuppliersmarketplace/index/cancellocation",
+})
+.done(function( msg ) {
+    ps(".popup").hide();
+ps("#overlay").hide();
+
+        location.reload();
+ps("#overlay").remove();
+  });
+  });
+  });
+
+</script>  
+  <?php  
+} ?>
+
+
+
+
+
+
+
+<?php 
+$piecesurl = explode("/" , $_SERVER['REQUEST_URI']);
+if(in_array("vendorregisteration",$piecesurl))
+{}else{?>
+<!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.js"></script>-->
+<?php }
+?>
+
+
+<?php  
+
+ Mage::getModel('core/cookie')->set('testcookie', 'testvalue');      
+
+    if (Mage::getModel('core/cookie')->get('testcookie') != "") {
+        $flags = Mage::getModel('core/cookie')->get('Psolflag');
+    } else {
+       $flags = Mage::getSingleton('core/session', array('name' => 'frontend'))->getPsolflag();
+    }
+
+if($flags == '')
+
+{?>
+
+<script type='text/javascript'>
+
+var ps = jQuery.noConflict();
+ps(document).keypress(function(event) {
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if (keycode == '13') {
+        ps('.close').click();
+    }
+});
+ps(document).ready(function() {  
+    var overlay = ps('<div id="overlay"></div>');
+
+    overlay.show();
+
+overlay.appendTo(document.body);
+ps(".psol_content").show();
+ps(".popup").show();
+
+ps("#emsg").hide();
+
+ps(function(){
+
+var overlay = ps('<div id="overlay"></div>');
+
+
+
+
+
+ps('.location span').click(function(){
+
+    ps('#emsg').show();
+
+    overlay.show();
+
+overlay.appendTo(document.body);
+ps(".psol_content").show();
+ps(".popup").show();
+
+})
+
+ps('#test').click(function(){
+
+    ps('#emsg').show();
+
+    overlay.show();
+
+overlay.appendTo(document.body);
+ps(".psol_content").show();
+ps(".popup").show();
+
+})
+
+ps('.close').click(function(){ 
+    ps.ajax({
+
+  type: "GET",
+
+  url: ps("#baseurl").val() + "multisuppliersmarketplace/brand/savecookie?categoryname="+ps(this).find('span').find('span').attr("rel") ,
+})
+
+  .done(function( msg ) {
+  });
+
+    var state = "";
+
+    if(ps(".ajaxstateselectpopup").is(':visible'))
+
+       {
+       
+
+        state = ps(".ajaxstateselectpopup").children("option").filter(":selected").text();
+       }
+
+       else{
+
+        state = ps(".ajaxstateselectpopuptext").val();
+       }
+
+    if(ps("#country_id_ajax").val() != "" && state != "" && ps("#city_ship_ajax").val() != "")
+
+    {
+
+        ps.ajax({
+
+  type: "GET",
+
+  url:  ps("#baseurl").val() + "multisuppliersmarketplace/index/test", //ps("#baseurl").val()
+
+  data: { country:ps("#country_id_ajax").val() , region:  state ,city: ps("#city_ship_ajax").val(),flag:"true" }
+
+})
+
+  .done(function( msg ) {
+
+    ps("#overlay").hide();
+        location.reload();
+ps("#overlay").remove();
+
+  
+
+
+
+  });
+
+   ps('.popup').hide();
+
+    }
+
+    else{
+
+        alert('Please verify Location');
+
+    } 
+
+    
+
+
+
+return false;
+
+});
+
+});
+
+});
+
+</script>
+
+<?php }else{
+
+    
+
+    ?>
+
+    <script type='text/javascript'>
+
+var ps = jQuery.noConflict();
+ps(document).keypress(function(event) {
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+    if (keycode == '13') {
+        ps('.close').click();
+    }
+});
+ps(document).ready(function() {
+ps('#overlay').live('click',function(){
+     ps(".popup").hide();
+     ps("#overlay").hide();
+
+ps("#overlay").remove();
+}); 
+    ps(".popup").hide();
+
+    ps('#emsg').hide();
+
+ps(function(){
+
+ps('#test').click(function(){
+
+    
+
+    var overlay = ps('<div id="overlay"></div>');
+
+    overlay.show();
+
+overlay.appendTo(document.body);
+ps(".psol_content").show();
+ps(".popup").show();
+
+ps('#emsg').show();
+
+});
+
+ps('.close').click(function(){
+ ps.ajax({
+
+  type: "GET",
+
+  url: ps("#baseurl").val() + "multisuppliersmarketplace/brand/savecookie?categoryname="+ps(this).find('span').find('span').attr("rel") ,
+})
+
+  .done(function( msg ) {
+  });
+    var state = "";
+
+    if(ps(".ajaxstateselectpopup").is(':visible'))
+
+       {
+
+        state = ps(".ajaxstateselectpopup").children("option").filter(":selected").text()
+
+       }
+
+       else{
+
+        state = ps(".ajaxstateselectpopuptext").val();
+
+       }
+
+    if(ps("#country_id_ajax").val() != "" && state != "" && ps("#city_ship_ajax").val() != "")
+
+    {
+
+        ps.ajax({
+
+  type: "GET",
+
+  url: <?php echo Mage::getBaseUrl();?>multisuppliersmarketplace/index/test",
+
+  data: { country:ps("#country_id_ajax").val() , region:  state ,city: ps("#city_ship_ajax").val(),flag:"true" }
+
+})
+
+  .done(function( msg ) {
+if(msg == "alldone")
+{
+    
+    var full_url = document.URL.replace("?chkcart=ttrue","");
+    var loc = window.location += "?chkcart=ttrue";
+    window.location.href = full_url + "?chkcart=ttrue";
+    //location.reload();
+}
+    ps("#overlay").hide();
+
+ps("#overlay").remove();
+
+  
+
+
+
+  });
+
+   ps('.popup').hide();
+
+    }
+
+    else{
+
+        alert('Please verify Location');
+
+    } 
+
+    
+
+
+
+return false;
+
+});
+
+});
+
+});
+
+</script>
+
+<?php  }
+
+
+
+?>
+
+</head>
+
+
+
+<body>
+
+
+
+<a style="display: none;" id="test"></a>
+
+<div style="display: none;" class="popup">
+
+<div class='psol_content' style="display: none;" id="cart-products">
+<div style="text-align: center;"><a href="<?php echo Mage::getBaseUrl(); ?>"><img src="<?php echo $this->getSkinUrl('images/logo.png'); ?>" /></a></div>
+</div>
+<div class='psol_content'style="display: none;" >
+
+<div style="position: absolute; top: 0;left: 0;background: black;width: 100%;height: 100%;display: none;opacity: 0.5;border-radius:7px;" id="over"></div>
+<div style="text-align: center;"><a href="<?php echo Mage::getBaseUrl(); ?>"><img src="<?php echo $this->getSkinUrl('images/logo.png'); ?>" /></a></div>
+<strong id="emsg">Your Shipping/Billing Address mismatches with your current location.</strong>
+
+<p>
+<strong id="mbl-msg" style="line-height: 20px;">Please Select the City, Province &amp; Country of delivery,to proceed forward.</strong>
+<strong id="desktop-msg" style="line-height: 25px;">Please Select the City, Province &amp; Country of delivery, depending on the location you select you will see products that are available for delivery within This area. Please Keep in mind that your final shipping address has to be also within the same area.</strong>
+<p style="margin-top: 5px;">Below is your Current location.</p> 
+
+<?php
+
+       function ip_details($ip){
+
+        $json = file_get_contents("http://ipinfo.io/{$ip}");
+
+        $jsonDecode = json_decode($json);
+
+        return $jsonDecode;
+
+       }
+
+       $remoteAddr = Mage::helper('core/http')->getRemoteAddr(true);
+
+       $info = ip_details(long2ip($remoteAddr));
+
+Mage::getModel('core/cookie')->set('testcookie', 'testvalue');      
+
+    if (Mage::getModel('core/cookie')->get('testcookie') != "") 
+
+       {
+        if(Mage::getModel('core/cookie')->get('Country') == '')
+
+       {
+
+        $ipcountry = $info->country;
+
+        $ipregion = $info->region;
+
+        $ipcity = $info->city;
+
+        
+
+       }else{
+
+        $ipcountry = Mage::getModel('core/cookie')->get('Country');
+
+        $ipregion = Mage::getModel('core/cookie')->get('Region');
+
+        $ipcity = Mage::getModel('core/cookie')->get('City');
+
+       }
+       }else{
+        if(Mage::getSingleton('core/session', array('name' => 'frontend'))->getCountry() == '')
+
+       {
+
+        $ipcountry = $info->country;
+
+        $ipregion = $info->region;
+
+        $ipcity = $info->city;
+
+        
+
+       }else{
+
+        $ipcountry = Mage::getSingleton('core/session', array('name' => 'frontend'))->getCountry();
+
+        $ipregion = Mage::getSingleton('core/session', array('name' => 'frontend'))->getRegion();
+
+        $ipcity = Mage::getSingleton('core/session', array('name' => 'frontend'))->getCity();
+
+       }
+       }
+
+       
+
+       
+
+       ?>
+
+<ul style="margin-top: 15px;" class="form-list">
+
+            <li class="fields">
+
+                    <div style="width: 100% !important;" class="field">
+
+                        <label > <?php echo $this->__('Country') ?></label>
+
+                        <div style="width: 100% !important;" class="input-box ajaxcountry">
+
+<?php if (count($this->loadcountries()) > 0): ?>
+
+	<select style="width: 100% !important;" id="country_id_ajax" onchange="getstate(this)" name="country">
+
+		<option value="">-- Please Select --</option>
+
+		<?php foreach($this->loadcountries() as $_country): ?>
+
+			<option <?php if($_country['value'] == $ipcountry){echo('selected=selected');} ?> value="<?php echo $_country['value'] ?>">
+
+				<?php echo $_country['label'] ?>
+
+			</option>
+
+		<?php endforeach; ?>
+
+	</select>
+
+    <script type="text/javascript">
+
+            function getstate(selectElement){
+
+                $('region_id_ajax').show();
+
+                $('regiontext').hide();
+
+                var reloadurl = $('baseurl').value + "multisuppliersmarketplace/index/state/country/" + selectElement.value; //$('baseurl').value + "
+
+                new Ajax.Request(reloadurl, {
+
+                    method: 'get',
+
+                    onLoading: function (stateform) {
+
+                        $('region_id_ajax').update('Searching...');
+
+                        $('over').show();
+
+                    },
+
+                    onComplete: function(stateform) {
+
+                        $('over').hide();
+                        $('region_id_ajax').show();
+
+                        $('region_id_ajax').update(stateform.responseText);
+
+                        if(stateform.responseText == 'none')
+
+                        {
+
+                        $('region_id_ajax').hide();
+
+                        $('regiontext').show();
+
+                        }
+
+                    }
+
+                });
+
+            }
+
+        </script>
+
+<?php endif; ?>
+
+
+
+                        </div>
+
+                    </div>
+
+                    <div class="field" style="width: 100% !important;">
+
+                        <label for="region_id_ajax"><?php echo $this->__('State/Province') ?></label>
+
+                        <div class="input-box" style="width: 100% !important;">
+                        <?php if($this->getRegionCollection($ipcountry,$ipregion) == "none"){
+                            ?>
+                            <select  style="display: none; width: 100% !important;" id="region_id_ajax" title="<?php echo $this->__('State/Province') ?>" class="ajaxstateselectpopup">
+
+                                <option>Please Enter Province</option>
+
+                            </select>
+                            <input style="width: 100% !important;" type="text" id="regiontext"  value="<?php echo $ipregion;?>" title="<?php echo $this->__('State/Province') ?>" class="ajaxstateselectpopuptext input-text" />
+                            <?php
+                        }else{
+                            ?>
+                            <select style="width: 100% !important;" id="region_id_ajax" title="<?php echo $this->__('State/Province') ?>" class="ajaxstateselectpopup">
+
+                                <?php echo $this->getRegionCollection($ipcountry,$ipregion); ?>
+
+                            </select>
+                            <input type="text" id="regiontext"  value="<?php echo $ipregion;?>" title="<?php echo $this->__('State/Province') ?>" class="ajaxstateselectpopuptext input-text" style="display: none; width: 100% !important;" />
+                        <?php } ?>                        
+
+                            
+
+                            
+
+                        </div>
+
+                    </div>
+
+                    <div style="width: 100% !important;" class="field">
+
+                        <label for="city_ship_chk"><?php echo $this->__('Add City') ?></label>
+
+                        <div style="width: 100% !important;" class="input-box">
+
+                            <input style="width: 100% !important;" type="text" title="<?php echo $this->__('City_ship') ?>" class=" ajaxcitytext input-text " id="city_ship_ajax" value="<?php echo $ipcity;?>"/>
+
+                        </div>
+
+                    </div>
+
+                    <input  id="baseurl" type="hidden" value="<?php echo Mage::getBaseUrl(); ?>"/>
+
+                    </li>
+
+                    </ul>
+
+
+
+
+<p>
+<?php if(Mage::app()->getStore()->getId() == 1): ?>   
+<button style="margin-right: 20px" class="button close"><span><span rel="man" style="background: gray; color: black !important; font-weight: bold;">Shop For Men</span></span></button>
+<button style="" class="button close"><span><span rel="woman" style="background: gray; color: black !important; font-weight: bold;">Shop For Women</span></span></button>
+<?php else: ?>
+<button style="" class="button close"><span><span style="background: gray; color: black !important; font-weight: bold;">Submit</span></span></button>
+<?php endif; ?>
+</p>  
+
+
+
+
+
+</div>
+
+</div>         
+
+</body>
+
+</html>

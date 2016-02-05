@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <CreteSol_TestModule>
+            <active>true</active>
+            <codePool>local</codePool>
+            <depends></depends>
+        </CreteSol_TestModule>
+    </modules>
+</config>

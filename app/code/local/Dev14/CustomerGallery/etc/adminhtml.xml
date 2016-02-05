@@ -1,0 +1,52 @@
+<config>
+    <menu>
+        <customergallery>
+            <title>Customer Gallery</title>
+            <sort_order>32</sort_order>
+            <action>adminhtml/gallery/index</action>
+        </customergallery>
+    </menu>
+
+    <acl>
+
+            <resources>
+
+                <admin>
+
+                    <children>
+
+                        <customergallery>
+                            <title>Customer Gallery</title>
+                                
+                                    
+
+                        </customergallery>
+                        <!-- <system>
+
+                            <children>
+
+                                <config>
+
+                                    <children>
+
+                                        <orderprocessing>
+
+                                            <title>Orderprocessing</title>
+
+                                        </orderprocessing>
+
+                                    </children>
+
+                                </config>
+
+                            </children>
+
+                        </system> -->
+                    </children>
+
+                </admin>
+
+            </resources>
+
+        </acl>
+</config>

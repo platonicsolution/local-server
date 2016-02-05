@@ -1,0 +1,43 @@
+<?php $product =  Mage::registry('current_product'); ?>
+<?php
+$setId = $product->getAttributeSetId(); // Attribute set Id
+        $groups = Mage::getModel('eav/entity_attribute_group')
+            ->getResourceCollection()
+            ->setAttributeSetFilter($setId)
+            ->setSortOrder()
+            ->load();
+
+        $attributeCodes = array();
+        foreach ($groups as $group) {
+            if($group->getAttributeGroupName() == 'Specifications'){ // set name
+            //$groupName          = $group->getAttributeGroupName();
+            //$groupId            = $group->getAttributeGroupId();
+
+            $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->setAttributeGroupFilter($group->getId())
+                ->addVisibleFilter()
+                ->load();
+                if ($attributes->getSize() > 0) {
+                    foreach ($attributes->getItems() as $attribute) {
+                        /* @var $child Mage_Eav_Model_Entity_Attribute */
+                        $attributeCodes[$attribute->getFrontendLabel()] = array ("type"=>$attribute->getFrontendInput(),"code"=>$attribute->getAttributeCode());                     
+                    }
+                } 
+          }
+        }
+
+//echo("<pre>");
+//print_r($attributeCodes);
+?>
+<p><strong><?php echo $this->__('Supplier part #:'); ?> </strong> <?php echo $product->getData('sku');?></p>
+<?php 
+foreach($attributeCodes as $label=>$code):?>
+<?php if ($product->getData($code['code']) !=""): ?>
+<?php if ($code['type'] =="text"): ?>
+<p><strong><?php echo $label ?> :</strong> <?php echo $product->getData($code['code']);?></p>
+<?php elseif($code['type'] =="select"): ?>
+<p><strong><?php echo $label ?> :</strong> <?php echo $product->getAttributeText($code['code']);?></p>
+<?php endif; ?>
+<?php endif; ?>
+<?php endforeach;
+ ?>
